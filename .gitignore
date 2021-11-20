@@ -50,3 +50,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+#Bison and flex output
+lex.yy.c
+*.tab.c
+*.tab.h
