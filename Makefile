@@ -8,4 +8,4 @@ lex.yy.c: aul.l
 	flex $^
 
 clean:
-	rm -f lex-yy.c aul.tab.* *.out *.o
+	rm -f lex.yy.c aul.tab.* *.out *.o
