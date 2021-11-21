@@ -16,8 +16,19 @@ void storeNumber(void);
 
 "\n"|" "|"\t"   ;
 
+
 [a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return identifier;
 [0-9]+"."?[0-9]*   storeNumber(); return number;
+
+"("  return leftParen;
+")"  return rightParen;
+"["  return leftBracket;
+"]"  return rightBracket;
+"{"  return leftBrace;
+"}"  return rightBrace;
+","  return comma;
+"."  return dot;
+";"  return semicolon;
 
 .   yyerror("Unknown character"); return 0;
 

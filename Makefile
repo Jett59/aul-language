@@ -1,4 +1,4 @@
-program.out: aul.tab.c lex.yy.c
+program.out: aul.tab.c lex.yy.c ast.c
 	clang $^ -o $@ -lfl
 
 %.tab.c: %.y

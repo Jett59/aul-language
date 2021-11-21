@@ -17,15 +17,16 @@ int yylex();
 }
 
 %token identifier number
+%token leftParen rightParen leftBracket rightBracket leftBrace rightBrace comma dot semicolon
 
 %type <string> identifier
 %type <number> number
 
-%start code
+%start program
 
 %%
 
-code: number  {printf("found '%f'!\n", $1); };
+program: number  {printf("found '%f'!\n", $1); };
 
 %%
 
