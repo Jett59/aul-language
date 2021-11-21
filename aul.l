@@ -38,6 +38,9 @@ void storeNumber(void);
 "."  return DOT;
 ";"  return SEMICOLON;
 
+"+"  return PLUS;
+"-"  return MINUS;
+
 .   yyerror("Unknown character"); return 0;
 
 %%

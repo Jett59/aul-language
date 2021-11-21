@@ -11,7 +11,9 @@ enum astNodeType {
   statements,
   returnStatement,
   numberExpression,
-  variableReferenceExpression
+  variableReferenceExpression,
+  addExpression,
+  subtractExpression
 };
 
 union astNodeValue {

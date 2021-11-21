@@ -30,12 +30,15 @@ static struct astNode* astRoot;
 %token EXPORT INTERNAL
 %token INSTANCE STATIC
 %token RETURN
+%token PLUS MINUS
 
 %type <string> IDENTIFIER dottedIdentifier type
 %type <number> NUMBER
 
 %type <node> program moduleDeclaration packageDefinition definitions definition statement statements variableDefinition functionDefinition returnStatement expression
 %type <flags> visibility scope
+
+%left PLUS MINUS
 
 %start program
 
@@ -84,11 +87,20 @@ returnStatement: RETURN expression SEMICOLON {
     $$ = createAstNode(returnStatement, (union astNodeValue) {}, flag_null, 1, $2);
 }
 
-expression: NUMBER {
+expression: LEFT_PAREN expression RIGHT_PAREN {
+    $$ = $2;
+}
+| NUMBER {
     $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, flag_null, 0);
 }
 | IDENTIFIER {
     $$ = createAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, flag_null, 0);
+}
+| expression PLUS expression {
+    $$ = createAstNode(addExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);
+}
+| expression MINUS expression {
+    $$ = createAstNode(subtractExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);
 }
 
 type: IDENTIFIER
