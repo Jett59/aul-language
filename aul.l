@@ -22,6 +22,7 @@ void storeNumber(void);
 "instance"  return INSTANCE;
 "module"  return MODULE;
 "package"  return PACKAGE;
+"return"  return RETURN;
 
 [a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return IDENTIFIER;
 [0-9]+"."?[0-9]*   storeNumber(); return NUMBER;

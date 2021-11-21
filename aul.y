@@ -29,11 +29,12 @@ static struct astNode* astRoot;
 %token MODULE PACKAGE
 %token EXPORT INTERNAL
 %token INSTANCE STATIC
+%token RETURN
 
-%type <string> IDENTIFIER dottedIdentifier
+%type <string> IDENTIFIER dottedIdentifier type
 %type <number> NUMBER
 
-%type <node> program moduleDeclaration packageDefinition definitions definition variableDefinition functionDefinition expression
+%type <node> program moduleDeclaration packageDefinition definitions definition statement statements variableDefinition functionDefinition returnStatement expression
 %type <flags> visibility scope
 
 %start program
@@ -62,17 +63,35 @@ definitions: definitions definition {
 
 definition: variableDefinition | functionDefinition;
 
-variableDefinition: visibility scope IDENTIFIER IDENTIFIER EQUALS expression SEMICOLON {
+statements: statements statement {
+    $$ = addAstNode(&$1, $2);
+}
+| statement {
+    $$ = createAstNode(statements, (union astNodeValue) {}, flag_null, 1, $1);
+}
+
+statement: returnStatement;
+
+variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON {
     $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $6);
 }
 
-functionDefinition: visibility scope IDENTIFIER IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE {
-    $$ = createAstNode(functionDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 0);
+functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
+    $$ = createAstNode(functionDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $8);
+}
+
+returnStatement: RETURN expression SEMICOLON {
+    $$ = createAstNode(returnStatement, (union astNodeValue) {}, flag_null, 1, $2);
 }
 
 expression: NUMBER {
     $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, flag_null, 0);
 }
+| IDENTIFIER {
+    $$ = createAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, flag_null, 0);
+}
+
+type: IDENTIFIER
 
 visibility: EXPORT {
     $$ = flag_export;

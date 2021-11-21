@@ -8,7 +8,10 @@ enum astNodeType {
   definitions,
   variableDefinition,
   functionDefinition,
-  numberExpression
+  statements,
+  returnStatement,
+  numberExpression,
+  variableReferenceExpression
 };
 
 union astNodeValue {

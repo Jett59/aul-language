@@ -36,43 +36,53 @@ struct astNode *addAstNode(struct astNode **dest, struct astNode *element) {
 void dumpTree(struct astNode *root) {
   switch (root->type) {
   case program: {
-    if (root->numChildren != 2) {
-      fprintf(stderr,
-              "Warning: wrong number of children for type program: %d\n",
-              root->numChildren);
-    }
-    printf("Program: ");
+    printf("Program");
     break;
   }
   case moduleDeclaration: {
-    printf("module %s: ", root->value.string);
+    printf("module '%s'", root->value.string);
     break;
   }
   case packageDefinition: {
-    printf("package %s: ", root->value.string);
+    printf("package '%s'", root->value.string);
     break;
   }
   case definitions: {
-    printf("definitions: ");
+    printf("definitions");
+    break;
+  }
+  case statements: {
+    printf("Statements");
     break;
   }
   case variableDefinition: {
-    printf("Variable '%s' of type '%s': ", root->value.stringPair[1],
+    printf("Variable '%s' of type '%s'", root->value.stringPair[1],
            root->value.stringPair[0]);
     break;
   }
   case functionDefinition: {
-    printf("Function '%s' returns '%s': ", root->value.stringPair[1],
+    printf("Function '%s' returns '%s'", root->value.stringPair[1],
            root->value.stringPair[0]);
     break;
   }
+  case returnStatement: {
+    printf("Return");
+    break;
+  }
   case numberExpression: {
-    printf("Number %f: ", root->value.number);
+    printf("Number %f", root->value.number);
+    break;
+  }
+  case variableReferenceExpression: {
+    printf("Variable reference '%s'", root->value.string);
     break;
   }
   default:
-    fprintf(stderr, "Warning: unknown node type %d\n", root->type);
+    printf("Unknown node type %d", root->type);
     break;
+  }
+  if (root->numChildren > 0 || root->flags != 0) {
+    printf(": ");
   }
   enum astNodeFlags flags = root->flags;
   if (flags & flag_export) {
@@ -85,9 +95,12 @@ void dumpTree(struct astNode *root) {
   } else if (flags & flag_instance) {
     printf("instance ");
   }
+  if (root->numChildren > 0) {
   printf("{\n");
   for (int i = 0; i < root->numChildren; i++) {
     dumpTree(root->children[i]);
   }
-  printf("}\n");
+  printf("}");
+  }
+  printf("\n");
 }
