@@ -10,7 +10,7 @@ union astNodeValue {
   double numberPair[2];
 };
 
-enum astNodeFlags { flag_null = 0, flag_exported = 1, flag_internal = 2 };
+enum astNodeFlags { flag_null = 0, flag_export = 1, flag_internal = 2 };
 
 struct astNode {
   enum astNodeType type;

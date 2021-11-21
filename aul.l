@@ -16,6 +16,8 @@ void storeNumber(void);
 
 "\n"|" "|"\t"   ;
 
+"export"  return export;
+"internal"  return internal;
 "module"  return module;
 "package"  return package;
 

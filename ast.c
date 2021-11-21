@@ -32,20 +32,26 @@ void dumpTree(struct astNode *root) {
               "Warning: wrong number of children for type program: %d\n",
               root->numChildren);
     }
-    printf("Program ");
+    printf("Program: ");
     break;
   }
   case moduleDeclaration: {
-    printf("module %s ", root->value.string);
+    printf("module %s: ", root->value.string);
     break;
   }
   case packageDefinition: {
-    printf("package %s ", root->value.string);
+    printf("package %s: ", root->value.string);
     break;
   }
   default:
     fprintf(stderr, "Warning: unknown node type %d\n", root->type);
     break;
+  }
+  enum astNodeFlags flags = root->flags;
+  if (flags & flag_export) {
+    printf("export ");
+  }else if (flags & flag_internal) {
+    printf("internal ");
   }
   printf("{\n");
   for (int i = 0; i < root->numChildren; i++) {

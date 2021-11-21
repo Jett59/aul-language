@@ -1,3 +1,7 @@
+%code requires {
+    #include "ast.h"
+}
+
 %{
 
 #define YYERROR_VERBOSE 1
@@ -5,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ast.h"
 
 void yyerror(const char* str);
 int yylex();
@@ -17,17 +20,20 @@ static struct astNode* astRoot;
 %union {
     char* string;
     double number;
+    enum astNodeFlags flags;
     struct astNode* node;
 }
 
 %token identifier number
 %token leftParen rightParen leftBracket rightBracket leftBrace rightBrace comma dot semicolon
 %token module package
+%token export internal
 
 %type <string> identifier dottedIdentifier
 %type <number> number
 
 %type <node> program moduleDeclaration packageDefinition
+%type <flags> visibility
 
 %start program
 
@@ -42,8 +48,18 @@ moduleDeclaration: module dottedIdentifier semicolon {
     $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, flag_null, 0);
 }
 
-packageDefinition: package identifier leftBrace rightBrace {
-    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $2}, flag_null, 0);
+packageDefinition: visibility package identifier leftBrace rightBrace {
+    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, $1, 0);
+}
+
+visibility: export {
+    $$ = flag_export;
+}
+| internal {
+    $$ = flag_internal;
+    }
+| {
+    $$ = flag_internal;
 }
 
 dottedIdentifier: dottedIdentifier dot identifier {
