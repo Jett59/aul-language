@@ -24,6 +24,15 @@ struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
   }
 }
 
+struct astNode *addAstNode(struct astNode **dest, struct astNode *element) {
+  int newElementCount = (*dest)->numChildren + 1;
+  struct astNode *newAstNode = *dest =
+      realloc(*dest, sizeof(struct astNode) +
+                         newElementCount * sizeof(struct astNode *));
+  newAstNode->children[newAstNode->numChildren++] = element;
+  return newAstNode;
+}
+
 void dumpTree(struct astNode *root) {
   switch (root->type) {
   case program: {
@@ -43,6 +52,15 @@ void dumpTree(struct astNode *root) {
     printf("package %s: ", root->value.string);
     break;
   }
+  case definitions: {
+    printf("definitions: ");
+    break;
+  }
+  case functionDefinition: {
+    printf("Function '%s' returns '%s': ", root->value.stringPair[1],
+           root->value.stringPair[0]);
+    break;
+  }
   default:
     fprintf(stderr, "Warning: unknown node type %d\n", root->type);
     break;
@@ -50,8 +68,13 @@ void dumpTree(struct astNode *root) {
   enum astNodeFlags flags = root->flags;
   if (flags & flag_export) {
     printf("export ");
-  }else if (flags & flag_internal) {
+  } else if (flags & flag_internal) {
     printf("internal ");
+  }
+  if (flags & flag_static) {
+    printf("static ");
+  } else if (flags & flag_instance) {
+    printf("instance ");
   }
   printf("{\n");
   for (int i = 0; i < root->numChildren; i++) {

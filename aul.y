@@ -28,12 +28,13 @@ static struct astNode* astRoot;
 %token leftParen rightParen leftBracket rightBracket leftBrace rightBrace comma dot semicolon
 %token module package
 %token export internal
+%token instanceScope staticScope
 
 %type <string> identifier dottedIdentifier
 %type <number> number
 
-%type <node> program moduleDeclaration packageDefinition
-%type <flags> visibility
+%type <node> program moduleDeclaration packageDefinition definitions definition functionDefinition
+%type <flags> visibility scope
 
 %start program
 
@@ -48,8 +49,21 @@ moduleDeclaration: module dottedIdentifier semicolon {
     $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, flag_null, 0);
 }
 
-packageDefinition: visibility package identifier leftBrace rightBrace {
-    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, $1, 0);
+packageDefinition: visibility package identifier leftBrace definitions rightBrace {
+    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, $1, 1, $5);
+}
+
+definitions: definitions definition {
+    $$ = addAstNode(&$1, $2);
+}
+| definition {
+    $$ = createAstNode(definitions, (union astNodeValue) {}, flag_null, 1, $1);
+}
+
+definition: functionDefinition;
+
+functionDefinition: visibility scope identifier identifier leftParen rightParen leftBrace rightBrace {
+    $$ = createAstNode(functionDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 0);
 }
 
 visibility: export {
@@ -60,6 +74,16 @@ visibility: export {
     }
 | {
     $$ = flag_internal;
+}
+
+scope: {
+    $$ = flag_instance;
+}
+| staticScope {
+    $$ = flag_static;
+}
+| instanceScope {
+    $$ = flag_instance;
 }
 
 dottedIdentifier: dottedIdentifier dot identifier {

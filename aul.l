@@ -18,6 +18,8 @@ void storeNumber(void);
 
 "export"  return export;
 "internal"  return internal;
+"static"  return staticScope;
+"instance"  return instanceScope;
 "module"  return module;
 "package"  return package;
 
