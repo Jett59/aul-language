@@ -16,6 +16,8 @@ void storeNumber(void);
 
 "\n"|" "|"\t"   ;
 
+"module"  return module;
+"package"  return package;
 
 [a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return identifier;
 [0-9]+"."?[0-9]*   storeNumber(); return number;

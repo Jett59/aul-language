@@ -1,5 +1,6 @@
 #include "ast.h"
 #include <stdarg.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
@@ -20,4 +21,34 @@ struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
     }
     return node;
   }
+}
+
+void dumpTree(struct astNode *root) {
+  switch (root->type) {
+  case program: {
+    if (root->numChildren != 2) {
+      fprintf(stderr,
+              "Warning: wrong number of children for type program: %d\n",
+              root->numChildren);
+    }
+    printf("Program ");
+    break;
+  }
+  case moduleDeclaration: {
+    printf("module %s ", root->value.string);
+    break;
+  }
+  case packageDefinition: {
+    printf("package %s ", root->value.string);
+    break;
+  }
+  default:
+    fprintf(stderr, "Warning: unknown node type %d\n", root->type);
+    break;
+  }
+  printf("{\n");
+  for (int i = 0; i < root->numChildren; i++) {
+    dumpTree(root->children[i]);
+  }
+  printf("}\n");
 }

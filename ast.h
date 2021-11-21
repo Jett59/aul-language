@@ -1,7 +1,7 @@
 #ifndef AUL_AST_H
 #define AUL_AST_H
 
-enum astNodeType {program};
+enum astNodeType {program, moduleDeclaration, packageDefinition};
 
 union astNodeValue {
   const char* string;
@@ -17,5 +17,7 @@ struct astNode {
 
 struct astNode* createAstNode(enum astNodeType type, union astNodeValue value,
                        int numChildren, ...);
+
+void dumpTree(struct astNode* root);
 
 #endif
