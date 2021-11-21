@@ -38,6 +38,7 @@ static struct astNode* astRoot;
 %type <node> program moduleDeclaration packageDefinition definitions definition statement statements variableDefinition functionDefinition returnStatement expression
 %type <flags> visibility scope
 
+%right EQUALS
 %left PLUS MINUS
 
 %start program
@@ -95,6 +96,9 @@ expression: LEFT_PAREN expression RIGHT_PAREN {
 }
 | IDENTIFIER {
     $$ = createAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, flag_null, 0);
+}
+| expression EQUALS expression {
+    $$ = createAstNode(assignExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);
 }
 | expression PLUS expression {
     $$ = createAstNode(addExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);

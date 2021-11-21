@@ -77,6 +77,10 @@ void dumpTree(struct astNode *root) {
     printf("Variable reference '%s'", root->value.string);
     break;
   }
+  case assignExpression: {
+      printf("Assign");
+      break;
+  }
   case addExpression: {
       printf("Add");
       break;
