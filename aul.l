@@ -16,26 +16,26 @@ void storeNumber(void);
 
 "\n"|" "|"\t"   ;
 
-"export"  return export;
-"internal"  return internal;
-"static"  return staticScope;
-"instance"  return instanceScope;
-"module"  return module;
-"package"  return package;
+"export"  return EXPORT;
+"internal"  return INTERNAL;
+"static"  return STATIC;
+"instance"  return INSTANCE;
+"module"  return MODULE;
+"package"  return PACKAGE;
 
-[a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return identifier;
-[0-9]+"."?[0-9]*   storeNumber(); return number;
+[a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return IDENTIFIER;
+[0-9]+"."?[0-9]*   storeNumber(); return NUMBER;
 
-"("  return leftParen;
-")"  return rightParen;
-"["  return leftBracket;
-"]"  return rightBracket;
-"{"  return leftBrace;
-"}"  return rightBrace;
-"="  return equals;
-","  return comma;
-"."  return dot;
-";"  return semicolon;
+"("  return LEFT_PAREN;
+")"  return RIGHT_PAREN;
+"["  return LEFT_BRACKET;
+"]"  return RIGHT_BRACKET;
+"{"  return LEFT_BRACE;
+"}"  return RIGHT_BRACE;
+"="  return EQUALS;
+","  return COMMA;
+"."  return DOT;
+";"  return SEMICOLON;
 
 .   yyerror("Unknown character"); return 0;
 

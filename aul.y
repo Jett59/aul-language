@@ -24,14 +24,14 @@ static struct astNode* astRoot;
     struct astNode* node;
 }
 
-%token identifier number
-%token leftParen rightParen leftBracket rightBracket leftBrace rightBrace equals comma dot semicolon
-%token module package
-%token export internal
-%token instanceScope staticScope
+%token IDENTIFIER NUMBER
+%token LEFT_PAREN RIGHT_PAREN LEFT_BRACKET RIGHT_BRACKET LEFT_BRACE RIGHT_BRACE EQUALS COMMA DOT SEMICOLON
+%token MODULE PACKAGE
+%token EXPORT INTERNAL
+%token INSTANCE STATIC
 
-%type <string> identifier dottedIdentifier
-%type <number> number
+%type <string> IDENTIFIER dottedIdentifier
+%type <number> NUMBER
 
 %type <node> program moduleDeclaration packageDefinition definitions definition variableDefinition functionDefinition expression
 %type <flags> visibility scope
@@ -45,11 +45,11 @@ program: moduleDeclaration packageDefinition {
     astRoot = $$;
 };
 
-moduleDeclaration: module dottedIdentifier semicolon {
+moduleDeclaration: MODULE dottedIdentifier SEMICOLON {
     $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, flag_null, 0);
 }
 
-packageDefinition: visibility package identifier leftBrace definitions rightBrace {
+packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE {
     $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, $1, 1, $5);
 }
 
@@ -62,39 +62,39 @@ definitions: definitions definition {
 
 definition: variableDefinition | functionDefinition;
 
-variableDefinition: visibility scope identifier identifier equals expression semicolon {
+variableDefinition: visibility scope IDENTIFIER IDENTIFIER EQUALS expression SEMICOLON {
     $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $6);
 }
 
-functionDefinition: visibility scope identifier identifier leftParen rightParen leftBrace rightBrace {
+functionDefinition: visibility scope IDENTIFIER IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE RIGHT_BRACE {
     $$ = createAstNode(functionDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 0);
 }
 
-expression: number {
+expression: NUMBER {
     $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, flag_null, 0);
 }
 
-visibility: export {
+visibility: EXPORT {
     $$ = flag_export;
 }
-| internal {
+| INTERNAL {
     $$ = flag_internal;
     }
 | {
     $$ = flag_internal;
 }
 
-scope: {
-    $$ = flag_instance;
-}
-| staticScope {
+scope: STATIC {
     $$ = flag_static;
 }
-| instanceScope {
+| INSTANCE {
+    $$ = flag_instance;
+}
+| {
     $$ = flag_instance;
 }
 
-dottedIdentifier: dottedIdentifier dot identifier {
+dottedIdentifier: dottedIdentifier DOT IDENTIFIER {
     char* newStr = malloc(strlen($1) + strlen($3) + 2);
     strcpy(newStr, $1);
     char dotChar = '.';
@@ -104,7 +104,7 @@ dottedIdentifier: dottedIdentifier dot identifier {
     free($3);
     $$ = newStr;
 }
-| identifier;
+| IDENTIFIER;
 
 %%
 
