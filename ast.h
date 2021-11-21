@@ -7,7 +7,8 @@ enum astNodeType {
   packageDefinition,
   definitions,
   variableDefinition,
-  functionDefinition
+  functionDefinition,
+  numberExpression
 };
 
 union astNodeValue {

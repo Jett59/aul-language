@@ -56,9 +56,18 @@ void dumpTree(struct astNode *root) {
     printf("definitions: ");
     break;
   }
+  case variableDefinition: {
+    printf("Variable '%s' of type '%s': ", root->value.stringPair[1],
+           root->value.stringPair[0]);
+    break;
+  }
   case functionDefinition: {
     printf("Function '%s' returns '%s': ", root->value.stringPair[1],
            root->value.stringPair[0]);
+    break;
+  }
+  case numberExpression: {
+    printf("Number %f: ", root->value.number);
     break;
   }
   default:

@@ -32,6 +32,7 @@ void storeNumber(void);
 "]"  return rightBracket;
 "{"  return leftBrace;
 "}"  return rightBrace;
+"="  return equals;
 ","  return comma;
 "."  return dot;
 ";"  return semicolon;

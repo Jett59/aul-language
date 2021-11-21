@@ -25,7 +25,7 @@ static struct astNode* astRoot;
 }
 
 %token identifier number
-%token leftParen rightParen leftBracket rightBracket leftBrace rightBrace comma dot semicolon
+%token leftParen rightParen leftBracket rightBracket leftBrace rightBrace equals comma dot semicolon
 %token module package
 %token export internal
 %token instanceScope staticScope
@@ -33,7 +33,7 @@ static struct astNode* astRoot;
 %type <string> identifier dottedIdentifier
 %type <number> number
 
-%type <node> program moduleDeclaration packageDefinition definitions definition functionDefinition
+%type <node> program moduleDeclaration packageDefinition definitions definition variableDefinition functionDefinition expression
 %type <flags> visibility scope
 
 %start program
@@ -60,10 +60,18 @@ definitions: definitions definition {
     $$ = createAstNode(definitions, (union astNodeValue) {}, flag_null, 1, $1);
 }
 
-definition: functionDefinition;
+definition: variableDefinition | functionDefinition;
+
+variableDefinition: visibility scope identifier identifier equals expression semicolon {
+    $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $6);
+}
 
 functionDefinition: visibility scope identifier identifier leftParen rightParen leftBrace rightBrace {
     $$ = createAstNode(functionDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 0);
+}
+
+expression: number {
+    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, flag_null, 0);
 }
 
 visibility: export {
