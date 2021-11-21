@@ -74,7 +74,7 @@ statements: statements statement {
     $$ = createAstNode(statements, (union astNodeValue) {}, flag_null, 1, $1);
 }
 
-statement: returnStatement;
+statement: returnStatement | expression SEMICOLON;
 
 variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON {
     $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $6);
