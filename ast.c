@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
-                              int numChildren, ...) {
+                              enum astNodeFlags flags, int numChildren, ...) {
   va_list children;
   va_start(children, numChildren);
   struct astNode *node =
@@ -15,6 +15,7 @@ struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
   } else {
     node->type = type;
     node->value = value;
+    node->flags = flags;
     node->numChildren = numChildren;
     for (int i = 0; i < numChildren; i++) {
       node->children[i] = va_arg(children, struct astNode *);

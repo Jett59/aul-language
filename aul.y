@@ -34,16 +34,16 @@ static struct astNode* astRoot;
 %%
 
 program: moduleDeclaration packageDefinition {
-    $$ = createAstNode(program, (union astNodeValue) {}, 2, $1, $2);
+    $$ = createAstNode(program, (union astNodeValue) {}, flag_null, 2, $1, $2);
     astRoot = $$;
 };
 
 moduleDeclaration: module dottedIdentifier semicolon {
-    $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, 0);
+    $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, flag_null, 0);
 }
 
 packageDefinition: package identifier leftBrace rightBrace {
-    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $2}, 0);
+    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $2}, flag_null, 0);
 }
 
 dottedIdentifier: dottedIdentifier dot identifier {
@@ -56,9 +56,7 @@ dottedIdentifier: dottedIdentifier dot identifier {
     free($3);
     $$ = newStr;
 }
-| identifier {
-    $$ = $1;
-}
+| identifier;
 
 %%
 
