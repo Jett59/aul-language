@@ -2,7 +2,7 @@ program.out: aul.tab.c lex.yy.c ast.c
 	clang $^ -o $@ -lfl
 
 %.tab.c: %.y
-	bison -v -d $^
+	bison -d $^
 
 lex.yy.c: aul.l
 	flex $^

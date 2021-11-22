@@ -155,7 +155,7 @@ void yyerror(const char* message) {
 
 int main () {
     const char* shouldDebug = getenv("AUL_PARSE_DEBUG");
-    if (shouldDebug != 0 && strcmp(shouldDebug, "y")) {
+    if (shouldDebug != 0 && strcmp(shouldDebug, "y") == 0) {
         yydebug = 1;
     }else {
         yydebug = 0;
