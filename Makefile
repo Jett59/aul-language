@@ -1,5 +1,12 @@
+CC=clang
+
+# Use gcc instead of clang on windows because it has better posix support
+ifeq ($(OS),Windows_NT)
+  CC=gcc
+endif
+
 program.out: aul.tab.c lex.yy.c ast.c
-	clang $^ -o $@
+	$(CC) $^ -o $@
 
 %.tab.c: %.y
 	bison -d $^
