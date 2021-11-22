@@ -2,6 +2,8 @@
     #include "ast.h"
 }
 
+%debug
+
 %{
 
 #define YYERROR_VERBOSE 1
@@ -35,7 +37,7 @@ static struct astNode* astRoot;
 %type <string> IDENTIFIER dottedIdentifier type
 %type <number> NUMBER
 
-%type <node> program moduleDeclaration packageDefinition definitions definition statement statements variableDefinition functionDefinition returnStatement expression
+%type <node> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition returnStatement expression
 %type <flags> visibility scope
 
 %right EQUALS
@@ -74,7 +76,11 @@ statements: statements statement {
     $$ = createAstNode(statements, (union astNodeValue) {}, flag_null, 1, $1);
 }
 
-statement: returnStatement | expression SEMICOLON;
+statement: returnStatement | expression SEMICOLON | localVariableDefinition;
+
+localVariableDefinition: type IDENTIFIER EQUALS expression SEMICOLON {
+    $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$1, $2}}, flag_null, 1, $4);
+}
 
 variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON {
     $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $6);
@@ -148,6 +154,7 @@ void yyerror(const char* message) {
 }
 
 int main () {
+    yydebug = 1;
     int parseResult = yyparse();
     if (parseResult != 0) {
         fprintf(stderr, "Failed to compile.\n");

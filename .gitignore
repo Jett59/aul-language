@@ -55,3 +55,6 @@ dkms.conf
 lex.yy.c
 *.tab.c
 *.tab.h
+
+#Visual Studio Code files
+/.vscode/

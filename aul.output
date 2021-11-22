@@ -1,0 +1,724 @@
+Terminals unused in grammar
+
+    LEFT_BRACKET
+    RIGHT_BRACKET
+    COMMA
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: moduleDeclaration packageDefinition
+
+    2 moduleDeclaration: MODULE dottedIdentifier SEMICOLON
+
+    3 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE
+
+    4 definitions: definitions definition
+    5            | definition
+
+    6 definition: variableDefinition
+    7           | functionDefinition
+
+    8 statements: statements statement
+    9           | statement
+
+   10 statement: returnStatement
+   11          | expression SEMICOLON
+   12          | localVariableDefinition
+
+   13 localVariableDefinition: type IDENTIFIER EQUALS expression SEMICOLON
+
+   14 variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON
+
+   15 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE
+
+   16 returnStatement: RETURN expression SEMICOLON
+
+   17 expression: LEFT_PAREN expression RIGHT_PAREN
+   18           | NUMBER
+   19           | IDENTIFIER
+   20           | expression EQUALS expression
+   21           | expression PLUS expression
+   22           | expression MINUS expression
+
+   23 type: IDENTIFIER
+
+   24 visibility: EXPORT
+   25           | INTERNAL
+   26           | %empty
+
+   27 scope: STATIC
+   28      | INSTANCE
+   29      | %empty
+
+   30 dottedIdentifier: dottedIdentifier DOT IDENTIFIER
+   31                 | IDENTIFIER
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    IDENTIFIER <string> (258) 3 13 14 15 19 23 30 31
+    NUMBER <number> (259) 18
+    LEFT_PAREN (260) 15 17
+    RIGHT_PAREN (261) 15 17
+    LEFT_BRACKET (262)
+    RIGHT_BRACKET (263)
+    LEFT_BRACE (264) 3 15
+    RIGHT_BRACE (265) 3 15
+    EQUALS (266) 13 14 20
+    COMMA (267)
+    DOT (268) 30
+    SEMICOLON (269) 2 11 13 14 16
+    MODULE (270) 2
+    PACKAGE (271) 3
+    EXPORT (272) 24
+    INTERNAL (273) 25
+    INSTANCE (274) 28
+    STATIC (275) 27
+    RETURN (276) 16
+    PLUS (277) 21
+    MINUS (278) 22
+
+
+Nonterminals, with rules where they appear
+
+    $accept (24)
+        on left: 0
+    program <node> (25)
+        on left: 1
+        on right: 0
+    moduleDeclaration <node> (26)
+        on left: 2
+        on right: 1
+    packageDefinition <node> (27)
+        on left: 3
+        on right: 1
+    definitions <node> (28)
+        on left: 4 5
+        on right: 3 4
+    definition <node> (29)
+        on left: 6 7
+        on right: 4 5
+    statements <node> (30)
+        on left: 8 9
+        on right: 8 15
+    statement <node> (31)
+        on left: 10 11 12
+        on right: 8 9
+    localVariableDefinition <node> (32)
+        on left: 13
+        on right: 12
+    variableDefinition <node> (33)
+        on left: 14
+        on right: 6
+    functionDefinition <node> (34)
+        on left: 15
+        on right: 7
+    returnStatement <node> (35)
+        on left: 16
+        on right: 10
+    expression <node> (36)
+        on left: 17 18 19 20 21 22
+        on right: 11 13 14 16 17 20 21 22
+    type <string> (37)
+        on left: 23
+        on right: 13 14 15
+    visibility <flags> (38)
+        on left: 24 25 26
+        on right: 3 14 15
+    scope <flags> (39)
+        on left: 27 28 29
+        on right: 14 15
+    dottedIdentifier <string> (40)
+        on left: 30 31
+        on right: 2 30
+
+
+State 0
+
+    0 $accept: . program $end
+
+    MODULE  shift, and go to state 1
+
+    program            go to state 2
+    moduleDeclaration  go to state 3
+
+
+State 1
+
+    2 moduleDeclaration: MODULE . dottedIdentifier SEMICOLON
+
+    IDENTIFIER  shift, and go to state 4
+
+    dottedIdentifier  go to state 5
+
+
+State 2
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 6
+
+
+State 3
+
+    1 program: moduleDeclaration . packageDefinition
+
+    EXPORT    shift, and go to state 7
+    INTERNAL  shift, and go to state 8
+
+    $default  reduce using rule 26 (visibility)
+
+    packageDefinition  go to state 9
+    visibility         go to state 10
+
+
+State 4
+
+   31 dottedIdentifier: IDENTIFIER .
+
+    $default  reduce using rule 31 (dottedIdentifier)
+
+
+State 5
+
+    2 moduleDeclaration: MODULE dottedIdentifier . SEMICOLON
+   30 dottedIdentifier: dottedIdentifier . DOT IDENTIFIER
+
+    DOT        shift, and go to state 11
+    SEMICOLON  shift, and go to state 12
+
+
+State 6
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 7
+
+   24 visibility: EXPORT .
+
+    $default  reduce using rule 24 (visibility)
+
+
+State 8
+
+   25 visibility: INTERNAL .
+
+    $default  reduce using rule 25 (visibility)
+
+
+State 9
+
+    1 program: moduleDeclaration packageDefinition .
+
+    $default  reduce using rule 1 (program)
+
+
+State 10
+
+    3 packageDefinition: visibility . PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE
+
+    PACKAGE  shift, and go to state 13
+
+
+State 11
+
+   30 dottedIdentifier: dottedIdentifier DOT . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 14
+
+
+State 12
+
+    2 moduleDeclaration: MODULE dottedIdentifier SEMICOLON .
+
+    $default  reduce using rule 2 (moduleDeclaration)
+
+
+State 13
+
+    3 packageDefinition: visibility PACKAGE . IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 15
+
+
+State 14
+
+   30 dottedIdentifier: dottedIdentifier DOT IDENTIFIER .
+
+    $default  reduce using rule 30 (dottedIdentifier)
+
+
+State 15
+
+    3 packageDefinition: visibility PACKAGE IDENTIFIER . LEFT_BRACE definitions RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 16
+
+
+State 16
+
+    3 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE . definitions RIGHT_BRACE
+
+    EXPORT    shift, and go to state 7
+    INTERNAL  shift, and go to state 8
+
+    $default  reduce using rule 26 (visibility)
+
+    definitions         go to state 17
+    definition          go to state 18
+    variableDefinition  go to state 19
+    functionDefinition  go to state 20
+    visibility          go to state 21
+
+
+State 17
+
+    3 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions . RIGHT_BRACE
+    4 definitions: definitions . definition
+
+    RIGHT_BRACE  shift, and go to state 22
+    EXPORT       shift, and go to state 7
+    INTERNAL     shift, and go to state 8
+
+    $default  reduce using rule 26 (visibility)
+
+    definition          go to state 23
+    variableDefinition  go to state 19
+    functionDefinition  go to state 20
+    visibility          go to state 21
+
+
+State 18
+
+    5 definitions: definition .
+
+    $default  reduce using rule 5 (definitions)
+
+
+State 19
+
+    6 definition: variableDefinition .
+
+    $default  reduce using rule 6 (definition)
+
+
+State 20
+
+    7 definition: functionDefinition .
+
+    $default  reduce using rule 7 (definition)
+
+
+State 21
+
+   14 variableDefinition: visibility . scope type IDENTIFIER EQUALS expression SEMICOLON
+   15 functionDefinition: visibility . scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE
+
+    INSTANCE  shift, and go to state 24
+    STATIC    shift, and go to state 25
+
+    $default  reduce using rule 29 (scope)
+
+    scope  go to state 26
+
+
+State 22
+
+    3 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE .
+
+    $default  reduce using rule 3 (packageDefinition)
+
+
+State 23
+
+    4 definitions: definitions definition .
+
+    $default  reduce using rule 4 (definitions)
+
+
+State 24
+
+   28 scope: INSTANCE .
+
+    $default  reduce using rule 28 (scope)
+
+
+State 25
+
+   27 scope: STATIC .
+
+    $default  reduce using rule 27 (scope)
+
+
+State 26
+
+   14 variableDefinition: visibility scope . type IDENTIFIER EQUALS expression SEMICOLON
+   15 functionDefinition: visibility scope . type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 27
+
+    type  go to state 28
+
+
+State 27
+
+   23 type: IDENTIFIER .
+
+    $default  reduce using rule 23 (type)
+
+
+State 28
+
+   14 variableDefinition: visibility scope type . IDENTIFIER EQUALS expression SEMICOLON
+   15 functionDefinition: visibility scope type . IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 29
+
+
+State 29
+
+   14 variableDefinition: visibility scope type IDENTIFIER . EQUALS expression SEMICOLON
+   15 functionDefinition: visibility scope type IDENTIFIER . LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE
+
+    LEFT_PAREN  shift, and go to state 30
+    EQUALS      shift, and go to state 31
+
+
+State 30
+
+   15 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN . RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE
+
+    RIGHT_PAREN  shift, and go to state 32
+
+
+State 31
+
+   14 variableDefinition: visibility scope type IDENTIFIER EQUALS . expression SEMICOLON
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 36
+
+
+State 32
+
+   15 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN . LEFT_BRACE statements RIGHT_BRACE
+
+    LEFT_BRACE  shift, and go to state 37
+
+
+State 33
+
+   19 expression: IDENTIFIER .
+
+    $default  reduce using rule 19 (expression)
+
+
+State 34
+
+   18 expression: NUMBER .
+
+    $default  reduce using rule 18 (expression)
+
+
+State 35
+
+   17 expression: LEFT_PAREN . expression RIGHT_PAREN
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 38
+
+
+State 36
+
+   14 variableDefinition: visibility scope type IDENTIFIER EQUALS expression . SEMICOLON
+   20 expression: expression . EQUALS expression
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+
+    EQUALS     shift, and go to state 39
+    SEMICOLON  shift, and go to state 40
+    PLUS       shift, and go to state 41
+    MINUS      shift, and go to state 42
+
+
+State 37
+
+   15 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE . statements RIGHT_BRACE
+
+    IDENTIFIER  shift, and go to state 43
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+    RETURN      shift, and go to state 44
+
+    statements               go to state 45
+    statement                go to state 46
+    localVariableDefinition  go to state 47
+    returnStatement          go to state 48
+    expression               go to state 49
+    type                     go to state 50
+
+
+State 38
+
+   17 expression: LEFT_PAREN expression . RIGHT_PAREN
+   20           | expression . EQUALS expression
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+
+    RIGHT_PAREN  shift, and go to state 51
+    EQUALS       shift, and go to state 39
+    PLUS         shift, and go to state 41
+    MINUS        shift, and go to state 42
+
+
+State 39
+
+   20 expression: expression EQUALS . expression
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 52
+
+
+State 40
+
+   14 variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON .
+
+    $default  reduce using rule 14 (variableDefinition)
+
+
+State 41
+
+   21 expression: expression PLUS . expression
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 53
+
+
+State 42
+
+   22 expression: expression MINUS . expression
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 54
+
+
+State 43
+
+   19 expression: IDENTIFIER .
+   23 type: IDENTIFIER .
+
+    IDENTIFIER  reduce using rule 23 (type)
+    $default    reduce using rule 19 (expression)
+
+
+State 44
+
+   16 returnStatement: RETURN . expression SEMICOLON
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 55
+
+
+State 45
+
+    8 statements: statements . statement
+   15 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements . RIGHT_BRACE
+
+    IDENTIFIER   shift, and go to state 43
+    NUMBER       shift, and go to state 34
+    LEFT_PAREN   shift, and go to state 35
+    RIGHT_BRACE  shift, and go to state 56
+    RETURN       shift, and go to state 44
+
+    statement                go to state 57
+    localVariableDefinition  go to state 47
+    returnStatement          go to state 48
+    expression               go to state 49
+    type                     go to state 50
+
+
+State 46
+
+    9 statements: statement .
+
+    $default  reduce using rule 9 (statements)
+
+
+State 47
+
+   12 statement: localVariableDefinition .
+
+    $default  reduce using rule 12 (statement)
+
+
+State 48
+
+   10 statement: returnStatement .
+
+    $default  reduce using rule 10 (statement)
+
+
+State 49
+
+   11 statement: expression . SEMICOLON
+   20 expression: expression . EQUALS expression
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+
+    EQUALS     shift, and go to state 39
+    SEMICOLON  shift, and go to state 58
+    PLUS       shift, and go to state 41
+    MINUS      shift, and go to state 42
+
+
+State 50
+
+   13 localVariableDefinition: type . IDENTIFIER EQUALS expression SEMICOLON
+
+    IDENTIFIER  shift, and go to state 59
+
+
+State 51
+
+   17 expression: LEFT_PAREN expression RIGHT_PAREN .
+
+    $default  reduce using rule 17 (expression)
+
+
+State 52
+
+   20 expression: expression . EQUALS expression
+   20           | expression EQUALS expression .
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+
+    EQUALS  shift, and go to state 39
+    PLUS    shift, and go to state 41
+    MINUS   shift, and go to state 42
+
+    $default  reduce using rule 20 (expression)
+
+
+State 53
+
+   20 expression: expression . EQUALS expression
+   21           | expression . PLUS expression
+   21           | expression PLUS expression .
+   22           | expression . MINUS expression
+
+    $default  reduce using rule 21 (expression)
+
+
+State 54
+
+   20 expression: expression . EQUALS expression
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+   22           | expression MINUS expression .
+
+    $default  reduce using rule 22 (expression)
+
+
+State 55
+
+   16 returnStatement: RETURN expression . SEMICOLON
+   20 expression: expression . EQUALS expression
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+
+    EQUALS     shift, and go to state 39
+    SEMICOLON  shift, and go to state 60
+    PLUS       shift, and go to state 41
+    MINUS      shift, and go to state 42
+
+
+State 56
+
+   15 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE .
+
+    $default  reduce using rule 15 (functionDefinition)
+
+
+State 57
+
+    8 statements: statements statement .
+
+    $default  reduce using rule 8 (statements)
+
+
+State 58
+
+   11 statement: expression SEMICOLON .
+
+    $default  reduce using rule 11 (statement)
+
+
+State 59
+
+   13 localVariableDefinition: type IDENTIFIER . EQUALS expression SEMICOLON
+
+    EQUALS  shift, and go to state 61
+
+
+State 60
+
+   16 returnStatement: RETURN expression SEMICOLON .
+
+    $default  reduce using rule 16 (returnStatement)
+
+
+State 61
+
+   13 localVariableDefinition: type IDENTIFIER EQUALS . expression SEMICOLON
+
+    IDENTIFIER  shift, and go to state 33
+    NUMBER      shift, and go to state 34
+    LEFT_PAREN  shift, and go to state 35
+
+    expression  go to state 62
+
+
+State 62
+
+   13 localVariableDefinition: type IDENTIFIER EQUALS expression . SEMICOLON
+   20 expression: expression . EQUALS expression
+   21           | expression . PLUS expression
+   22           | expression . MINUS expression
+
+    EQUALS     shift, and go to state 39
+    SEMICOLON  shift, and go to state 63
+    PLUS       shift, and go to state 41
+    MINUS      shift, and go to state 42
+
+
+State 63
+
+   13 localVariableDefinition: type IDENTIFIER EQUALS expression SEMICOLON .
+
+    $default  reduce using rule 13 (localVariableDefinition)
