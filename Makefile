@@ -1,5 +1,5 @@
 program.out: aul.tab.c lex.yy.c ast.c
-	clang $^ -o $@ -lfl
+	clang $^ -o $@
 
 %.tab.c: %.y
 	bison -d $^
