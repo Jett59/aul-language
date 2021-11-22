@@ -154,7 +154,12 @@ void yyerror(const char* message) {
 }
 
 int main () {
-    yydebug = 1;
+    const char* shouldDebug = getenv("AUL_PARSE_DEBUG");
+    if (shouldDebug != 0 && strcmp(shouldDebug, "y")) {
+        yydebug = 1;
+    }else {
+        yydebug = 0;
+    }
     int parseResult = yyparse();
     if (parseResult != 0) {
         fprintf(stderr, "Failed to compile.\n");
