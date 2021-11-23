@@ -1,5 +1,6 @@
 %code requires {
     #include "ast.h"
+    #include "type.h"
     #include <stdio.h>
 
     int parse(FILE* input, struct astNode** ast);
@@ -29,6 +30,7 @@ extern FILE* yyin;
     double number;
     enum astNodeFlags flags;
     struct astNode* node;
+    struct typeNode* type;
 }
 
 %token IDENTIFIER NUMBER
@@ -38,10 +40,12 @@ extern FILE* yyin;
 %token INSTANCE STATIC
 %token RETURN
 %token PLUS MINUS
+%token CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64
 
-%type <string> IDENTIFIER dottedIdentifier type
+%type <string> IDENTIFIER dottedIdentifier
 %type <number> NUMBER
 
+%type <type> type
 %type <node> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition returnStatement expression
 %type <flags> visibility scope
 
@@ -53,23 +57,23 @@ extern FILE* yyin;
 %%
 
 program: moduleDeclaration packageDefinition {
-    $$ = createAstNode(program, (union astNodeValue) {}, flag_null, 2, $1, $2);
+    $$ = createAstNode(program, (union astNodeValue) {}, TYPE_NONE, flag_null, 2, $1, $2);
     astRoot = $$;
 };
 
 moduleDeclaration: MODULE dottedIdentifier SEMICOLON {
-    $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, flag_null, 0);
+    $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, TYPE_NONE, flag_null, 0);
 }
 
 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE {
-    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, $1, 1, $5);
+    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, TYPE_NONE, $1, 1, $5);
 }
 
 definitions: definitions definition {
     $$ = addAstNode(&$1, $2);
 }
-| definition {
-    $$ = createAstNode(definitions, (union astNodeValue) {}, flag_null, 1, $1);
+| {
+    $$ = createAstNode(definitions, (union astNodeValue) {}, 0, flag_null, 0);
 }
 
 definition: variableDefinition | functionDefinition;
@@ -77,48 +81,89 @@ definition: variableDefinition | functionDefinition;
 statements: statements statement {
     $$ = addAstNode(&$1, $2);
 }
-| statement {
-    $$ = createAstNode(statements, (union astNodeValue) {}, flag_null, 1, $1);
+| {
+    $$ = createAstNode(statements, (union astNodeValue) {}, 0, flag_null, 0);
 }
 
 statement: returnStatement | expression SEMICOLON | localVariableDefinition;
 
 localVariableDefinition: type IDENTIFIER EQUALS expression SEMICOLON {
-    $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$1, $2}}, flag_null, 1, $4);
+    $$ = createAstNode(variableDefinition, (union astNodeValue) {.string = $2}, $1, flag_null, 1, $4);
 }
 
 variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON {
-    $$ = createAstNode(variableDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $6);
+    $$ = createAstNode(variableDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $6);
 }
 
 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
-    $$ = createAstNode(functionDefinition, (union astNodeValue) {.stringPair = {$3, $4}}, $1 | $2, 1, $8);
+    $$ = createAstNode(functionDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $8);
 }
 
 returnStatement: RETURN expression SEMICOLON {
-    $$ = createAstNode(returnStatement, (union astNodeValue) {}, flag_null, 1, $2);
+    $$ = createAstNode(returnStatement, (union astNodeValue) {}, 0, flag_null, 1, $2);
 }
 
 expression: LEFT_PAREN expression RIGHT_PAREN {
     $$ = $2;
 }
 | NUMBER {
-    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, flag_null, 0);
+    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, 0, flag_null, 0);
 }
 | IDENTIFIER {
-    $$ = createAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, flag_null, 0);
+    $$ = createAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, 0, flag_null, 0);
 }
 | expression EQUALS expression {
-    $$ = createAstNode(assignExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);
+    $$ = createAstNode(assignExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 | expression PLUS expression {
-    $$ = createAstNode(addExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);
+    $$ = createAstNode(addExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 | expression MINUS expression {
-    $$ = createAstNode(subtractExpression, (union astNodeValue) {}, flag_null, 2, $1, $3);
+    $$ = createAstNode(subtractExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 
-type: IDENTIFIER
+type: IDENTIFIER {
+    $$ = createTypeNode(TYPE_UNKNOWN, $1, 0);
+}
+| CHAR {
+    $$ = createTypeNode(TYPE_CHAR, 0, 0);
+}
+| I8 {
+    $$ = createTypeNode(TYPE_I8, 0, 0);
+}
+| I16 {
+    $$ = createTypeNode(TYPE_I16, 0, 0);
+}
+| I32 {
+    $$ = createTypeNode(TYPE_I32, 0, 0);
+}
+| I64 {
+    $$ = createTypeNode(TYPE_I64, 0, 0);
+}
+| ISIZE {
+    $$ = createTypeNode(TYPE_ISIZE, 0, 0);
+}
+| U8 {
+    $$ = createTypeNode(TYPE_U8, 0, 0);
+}
+| U16 {
+    $$ = createTypeNode(TYPE_U16, 0, 0);
+}
+| U32 {
+    $$ = createTypeNode(TYPE_U32, 0, 0);
+}
+| U64 {
+    $$ = createTypeNode(TYPE_U64, 0, 0);
+}
+| USIZE {
+    $$ = createTypeNode(TYPE_USIZE, 0, 0);
+}
+| F32 {
+    $$ = createTypeNode(TYPE_F32, 0, 0);
+}
+| F64 {
+    $$ = createTypeNode(TYPE_F64, 0, 0);
+}
 
 visibility: EXPORT {
     $$ = flag_export;

@@ -26,6 +26,20 @@ void storeNumber(void);
 "package"  return PACKAGE;
 "return"  return RETURN;
 
+"char"  return CHAR;
+"i8"  return I8;
+"i16"  return I16;
+"i32"  return I32;
+"i64"  return I64;
+"isize"  return ISIZE;
+"u8"  return U8;
+"u16"  return U16;
+"u32"  return U32;
+"u64"  return U64;
+"usize"  return USIZE;
+"f32"  return F32;
+"f64"  return F64;
+
 [a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return IDENTIFIER;
 [0-9]+"."?[0-9]*   storeNumber(); return NUMBER;
 

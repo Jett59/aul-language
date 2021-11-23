@@ -1,10 +1,11 @@
 #include "ast.h"
+#include "type.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
-                              enum astNodeFlags flags, int numChildren, ...) {
+struct astNode *createAstNode(enum astNodeType nodeType, union astNodeValue value,
+                              struct typeNode* type, enum astNodeFlags flags, int numChildren, ...) {
   va_list children;
   va_start(children, numChildren);
   struct astNode *node =
@@ -13,8 +14,9 @@ struct astNode *createAstNode(enum astNodeType type, union astNodeValue value,
     va_end(children);
     return 0;
   } else {
-    node->type = type;
+    node->nodeType = nodeType;
     node->value = value;
+    node->type = type;
     node->flags = flags;
     node->numChildren = numChildren;
     for (int i = 0; i < numChildren; i++) {
@@ -33,8 +35,8 @@ struct astNode *addAstNode(struct astNode **dest, struct astNode *element) {
   return newAstNode;
 }
 
-void dumpTree(struct astNode *root) {
-  switch (root->type) {
+void printTree(struct astNode *root) {
+  switch (root->nodeType) {
   case program: {
     printf("Program");
     break;
@@ -56,13 +58,11 @@ void dumpTree(struct astNode *root) {
     break;
   }
   case variableDefinition: {
-    printf("Variable '%s' of type '%s'", root->value.stringPair[1],
-           root->value.stringPair[0]);
+    printf("Variable '%s'", root->value.string);
     break;
   }
   case functionDefinition: {
-    printf("Function '%s' returns '%s'", root->value.stringPair[1],
-           root->value.stringPair[0]);
+    printf("Function '%s'", root->value.string);
     break;
   }
   case returnStatement: {
@@ -93,8 +93,11 @@ void dumpTree(struct astNode *root) {
     printf("Unknown node type %d", root->type);
     break;
   }
-  if (root->numChildren > 0 || root->flags != 0) {
+  if (root->numChildren > 0 || root->flags != 0 || root->type != 0) {
     printf(": ");
+  }
+  if (root->type != 0) {
+    printType(root->type);
   }
   enum astNodeFlags flags = root->flags;
   if (flags & flag_export) {
@@ -110,7 +113,7 @@ void dumpTree(struct astNode *root) {
   if (root->numChildren > 0) {
   printf("{\n");
   for (int i = 0; i < root->numChildren; i++) {
-    dumpTree(root->children[i]);
+    printTree(root->children[i]);
   }
   printf("}");
   }

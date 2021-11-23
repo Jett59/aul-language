@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     if (argc >= 2) {
       fclose(input);
     }
-    dumpTree(ast);
+    printTree(ast);
   }
   if (result != 0) {
     fprintf(stderr, "Compilation aborted.");
