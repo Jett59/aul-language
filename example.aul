@@ -16,4 +16,10 @@ export package countedReference {
     export ptr<i64> getRawPointer() {
         return rawPointer;
     }
+    export boolean isReferenceCounted() {
+        return true;
+    }
+    export boolean isAutomaticallyReferenceCounted () {
+        return false;
+    }
 }

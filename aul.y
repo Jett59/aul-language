@@ -42,6 +42,7 @@ extern FILE* yyin;
 %token RETURN
 %token PLUS MINUS
 %token BOOLEAN CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
+%token TRUE FALSE
 
 %type <string> IDENTIFIER dottedIdentifier
 %type <number> NUMBER
@@ -109,6 +110,12 @@ expression: LEFT_PAREN expression RIGHT_PAREN {
 }
 | NUMBER {
     $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, 0, flag_null, 0);
+}
+| TRUE {
+    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = 1}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
+}
+| FALSE {
+    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = 0}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
 }
 | IDENTIFIER {
     $$ = createAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, 0, flag_null, 0);
