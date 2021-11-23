@@ -46,7 +46,8 @@ void storeNumber(void);
 "ptr"  return PTR;
 
 [a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return IDENTIFIER;
-[0-9]+"."?[0-9]*   storeNumber(); return NUMBER;
+[0-9]+"."[0-9]*   storeNumber(); return DECIMAL;
+[0-9]+   storeNumber(); return INTEGER;
 
 "("  return LEFT_PAREN;
 ")"  return RIGHT_PAREN;

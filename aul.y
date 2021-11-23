@@ -33,7 +33,7 @@ extern FILE* yyin;
     struct typeNode* type;
 }
 
-%token IDENTIFIER NUMBER
+%token IDENTIFIER INTEGER DECIMAL
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACKET RIGHT_BRACKET LEFT_BRACE RIGHT_BRACE EQUALS COMMA DOT SEMICOLON
 %token LESS_THAN GREATER_THAN
 %token MODULE PACKAGE
@@ -45,7 +45,7 @@ extern FILE* yyin;
 %token TRUE FALSE
 
 %type <string> IDENTIFIER dottedIdentifier
-%type <number> NUMBER
+%type <number> INTEGER DECIMAL
 
 %type <type> type
 %type <node> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition returnStatement expression
@@ -108,8 +108,11 @@ returnStatement: RETURN expression SEMICOLON {
 expression: LEFT_PAREN expression RIGHT_PAREN {
     $$ = $2;
 }
-| NUMBER {
-    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, 0, flag_null, 0);
+| DECIMAL {
+    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, createTypeNode(TYPE_F64, 0, 0), flag_null, 0);
+}
+| INTEGER {
+    $$ = createAstNode(numberExpression, (union astNodeValue) {.number = $1}, createTypeNode(TYPE_I64, 0, 0), flag_null, 0);
 }
 | TRUE {
     $$ = createAstNode(numberExpression, (union astNodeValue) {.number = 1}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
