@@ -1,5 +1,8 @@
 %code requires {
     #include "ast.h"
+    #include <stdio.h>
+
+    int parse(FILE* input, struct astNode** ast);
 }
 
 %debug
@@ -16,6 +19,8 @@ void yyerror(const char* str);
 int yylex();
 
 static struct astNode* astRoot;
+
+extern FILE* yyin;
 
 %}
 
@@ -153,18 +158,15 @@ void yyerror(const char* message) {
     fprintf(stderr, "%s\n", message);
 }
 
-int main () {
+int parse(FILE* input, struct astNode** ast) {
     const char* shouldDebug = getenv("AUL_PARSE_DEBUG");
     if (shouldDebug != 0 && strcmp(shouldDebug, "y") == 0) {
         yydebug = 1;
     }else {
         yydebug = 0;
     }
+    yyin = input;
     int parseResult = yyparse();
-    if (parseResult != 0) {
-        fprintf(stderr, "Failed to compile.\n");
+    *ast = astRoot;
         return parseResult;
-    }else {
-        dumpTree(astRoot);
-    }
 }

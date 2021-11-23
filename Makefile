@@ -5,7 +5,7 @@ ifeq ($(OS),Windows_NT)
   CC=gcc
 endif
 
-program.out: aul.tab.c lex.yy.c ast.c
+program.out: main.c aul.tab.c lex.yy.c ast.c
 	$(CC) $^ -o $@
 
 %.tab.c: %.y

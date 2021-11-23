@@ -1,0 +1,17 @@
+module math;
+
+export package Counter {
+    internal i64 count = 0;
+
+    export i64 incrementAndGet () {
+        return count = count + 1;
+    }
+    export i64 getAndIncrement() {
+        i64 original = count;
+        count = count + 1;
+        return original;
+    }
+    export i64 get () {
+        return count;
+    }
+}
