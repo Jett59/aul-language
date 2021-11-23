@@ -26,6 +26,7 @@ void storeNumber(void);
 "package"  return PACKAGE;
 "return"  return RETURN;
 
+"boolean"  return BOOLEAN;
 "char"  return CHAR;
 "i8"  return I8;
 "i16"  return I16;

@@ -41,7 +41,7 @@ extern FILE* yyin;
 %token INSTANCE STATIC
 %token RETURN
 %token PLUS MINUS
-%token CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
+%token BOOLEAN CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
 
 %type <string> IDENTIFIER dottedIdentifier
 %type <number> NUMBER
@@ -125,6 +125,9 @@ expression: LEFT_PAREN expression RIGHT_PAREN {
 
 type: IDENTIFIER {
     $$ = createTypeNode(TYPE_UNKNOWN, $1, 0);
+}
+| BOOLEAN {
+    $$ = createTypeNode(TYPE_BOOLEAN, 0, 0);
 }
 | CHAR {
     $$ = createTypeNode(TYPE_CHAR, 0, 0);

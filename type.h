@@ -3,6 +3,7 @@
 
 enum typeType {
     TYPE_NONE,
+    TYPE_BOOLEAN,
   TYPE_CHAR,
   TYPE_I8,
   TYPE_I16,
