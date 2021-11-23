@@ -35,12 +35,13 @@ extern FILE* yyin;
 
 %token IDENTIFIER NUMBER
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACKET RIGHT_BRACKET LEFT_BRACE RIGHT_BRACE EQUALS COMMA DOT SEMICOLON
+%token LESS_THAN GREATER_THAN
 %token MODULE PACKAGE
 %token EXPORT INTERNAL
 %token INSTANCE STATIC
 %token RETURN
 %token PLUS MINUS
-%token CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64
+%token CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
 
 %type <string> IDENTIFIER dottedIdentifier
 %type <number> NUMBER
@@ -57,16 +58,16 @@ extern FILE* yyin;
 %%
 
 program: moduleDeclaration packageDefinition {
-    $$ = createAstNode(program, (union astNodeValue) {}, TYPE_NONE, flag_null, 2, $1, $2);
+    $$ = createAstNode(program, (union astNodeValue) {}, 0, flag_null, 2, $1, $2);
     astRoot = $$;
 };
 
 moduleDeclaration: MODULE dottedIdentifier SEMICOLON {
-    $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, TYPE_NONE, flag_null, 0);
+    $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, 0, flag_null, 0);
 }
 
 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE {
-    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, TYPE_NONE, $1, 1, $5);
+    $$ = createAstNode(packageDefinition, (union astNodeValue) {.string = $3}, 0, $1, 1, $5);
 }
 
 definitions: definitions definition {
@@ -163,6 +164,9 @@ type: IDENTIFIER {
 }
 | F64 {
     $$ = createTypeNode(TYPE_F64, 0, 0);
+}
+| PTR LESS_THAN type GREATER_THAN {
+    $$ = createTypeNode(TYPE_POINTER, 0, $3);
 }
 
 visibility: EXPORT {

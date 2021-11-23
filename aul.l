@@ -39,6 +39,7 @@ void storeNumber(void);
 "usize"  return USIZE;
 "f32"  return F32;
 "f64"  return F64;
+"ptr"  return PTR;
 
 [a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return IDENTIFIER;
 [0-9]+"."?[0-9]*   storeNumber(); return NUMBER;
@@ -53,6 +54,9 @@ void storeNumber(void);
 ","  return COMMA;
 "."  return DOT;
 ";"  return SEMICOLON;
+
+"<"  return LESS_THAN;
+">"  return GREATER_THAN;
 
 "+"  return PLUS;
 "-"  return MINUS;

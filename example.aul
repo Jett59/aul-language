@@ -1,17 +1,19 @@
-module math;
+module memory;
 
-export package Counter {
-    internal i64 count = 0;
+export package countedReference {
+    internal ptr<i64> rawPointer = 0;
+    internal i32 references = 0;
 
-    export i64 incrementAndGet () {
-        return count = count + 1;
+    export i32 getReferences() {
+        return references;
     }
-    export i64 getAndIncrement() {
-        i64 original = count;
-        count = count + 1;
-        return original;
+    export i32 allocateReference() {
+        references = references + 1;
     }
-    export i64 get () {
-        return count;
+    export i32 releaseReference() {
+        references = references - 1;
+    }
+    export ptr<i64> getRawPointer() {
+        return rawPointer;
     }
 }
