@@ -4,6 +4,7 @@
 #include "type.h"
 
 enum astNodeType {
+  symbolTable,
   program,
   moduleDeclaration,
   packageDefinition,

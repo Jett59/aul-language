@@ -36,7 +36,14 @@ struct astNode *addAstNode(struct astNode **dest, struct astNode *element) {
 }
 
 void printTree(struct astNode *root) {
+  if (root == 0) {
+    printf("(null)");
+  }else {
   switch (root->nodeType) {
+    case symbolTable: {
+      printf("Symbol table");
+      break;
+    }
   case program: {
     printf("Program");
     break;
@@ -124,6 +131,7 @@ void printTree(struct astNode *root) {
     printTree(root->children[i]);
   }
   printf("}");
+  }
   }
   printf("\n");
 }
