@@ -35,12 +35,11 @@ extern FILE* yyin;
 
 %token IDENTIFIER INTEGER DECIMAL
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACKET RIGHT_BRACKET LEFT_BRACE RIGHT_BRACE EQUALS COMMA DOT SEMICOLON
-%token LESS_THAN GREATER_THAN
+%token LESS_THAN GREATER_THAN PLUS MINUS MULTIPLY DIVIDE
 %token MODULE PACKAGE
 %token EXPORT INTERNAL
 %token INSTANCE STATIC
 %token RETURN
-%token PLUS MINUS
 %token BOOLEAN CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
 %token TRUE FALSE
 
@@ -53,6 +52,7 @@ extern FILE* yyin;
 
 %right EQUALS
 %left PLUS MINUS
+%left MULTIPLY DIVIDE
 
 %start program
 
@@ -131,6 +131,12 @@ expression: LEFT_PAREN expression RIGHT_PAREN {
 }
 | expression MINUS expression {
     $$ = createAstNode(subtractExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+}
+| expression MULTIPLY expression {
+    $$ = createAstNode(multiplyExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+}
+| expression DIVIDE expression {
+    $$ = createAstNode(divideExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 
 type: IDENTIFIER {

@@ -89,6 +89,14 @@ void printTree(struct astNode *root) {
     printf("Subtract");
     break;
   }
+  case multiplyExpression: {
+    printf("Multiply");
+    break;
+  }
+  case divideExpression: {
+    printf("Divide");
+    break;
+  }
   default:
     printf("Unknown node type %d", root->type);
     break;

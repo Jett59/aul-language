@@ -16,14 +16,14 @@ enum astNodeType {
   variableReferenceExpression,
   assignExpression,
   addExpression,
-  subtractExpression
+  subtractExpression,
+  multiplyExpression,
+  divideExpression
 };
 
 union astNodeValue {
   const char *string;
   double number;
-  const char *stringPair[2];
-  double numberPair[2];
 };
 
 enum astNodeFlags { flag_null = 0, flag_export = 1, flag_internal = 2, flag_instance = 4, flag_static = 8 };

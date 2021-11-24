@@ -1,25 +1,13 @@
-module memory;
+module example;
 
-export package countedReference {
-    internal ptr<i64> rawPointer = 0;
-    internal i32 references = 0;
+export package Circle {
+    internal static f64 pi = 3.1416;
+    internal i64 r = 25;
 
-    export i32 getReferences() {
-        return references;
+    export f64 getArea() {
+        return pi * (r * r);
     }
-    export i32 allocateReference() {
-        references = references + 1;
-    }
-    export i32 releaseReference() {
-        references = references - 1;
-    }
-    export ptr<i64> getRawPointer() {
-        return rawPointer;
-    }
-    export boolean isReferenceCounted() {
-        return true;
-    }
-    export boolean isAutomaticallyReferenceCounted () {
-        return false;
+    export f64 getCircumference () {
+        return 2 * pi * r;
     }
 }
