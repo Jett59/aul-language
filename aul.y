@@ -61,7 +61,7 @@ extern FILE* yyin;
 program: moduleDeclaration packageDefinition {
     $$ = createAstNode(program, (union astNodeValue) {}, 0, flag_null, 2, $1, $2);
     astRoot = $$;
-};
+}
 
 moduleDeclaration: MODULE dottedIdentifier SEMICOLON {
     $$ = createAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, 0, flag_null, 0);
@@ -99,6 +99,9 @@ variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON
 
 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
     $$ = createAstNode(functionDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $8);
+}
+| visibility scope IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
+    $$ = createAstNode(functionDefinition, (union astNodeValue) {.string = $3}, createTypeNode(TYPE_NONE, 0, 0), $1 | $2, 1, $7);
 }
 
 returnStatement: RETURN expression SEMICOLON {

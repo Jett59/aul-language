@@ -10,4 +10,10 @@ export package Circle {
     export f64 getCircumference () {
         return 2 * pi * r;
     }
+    export incrementCircumference () {
+        circumference = circumference + 1;
+    }
+    export decrementCircumference () {
+        circumference = circumference - 1;
+    }
 }
