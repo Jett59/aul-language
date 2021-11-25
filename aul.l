@@ -4,13 +4,22 @@
 
 #include <stdlib.h>
 #include "aul.tab.h"
+#include "error.h"
+
+extern const char* fileName;
 
 void yyerror(const char* message);
 
 void storeString(void);
 void storeNumber(void);
 
+static void updateLocation();
+
+#define YY_USER_ACTION updateLocation();
+
 %}
+
+%option bison-locations
 
 %%
 
@@ -80,4 +89,18 @@ void storeString(void) {
 
 void storeNumber(void) {
     yylval.number = atof(yytext);
+}
+
+static void updateLocation() {
+    yylloc.first_line = yylloc.last_line;
+    yylloc.first_column = yylloc.last_column;
+    int yytextLen = strlen(yytext);
+    for (int i = 0; i < yytextLen; i ++) {
+        if (yytext[i] == '\n') {
+            yylloc.last_line++;
+            yylloc.last_column = 0;
+        }else {
+            yylloc.last_column++;
+        }
+    }
 }

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct astNode *createAstNode(enum astNodeType nodeType, union astNodeValue value,
+struct astNode *createAstNode(int line, int column, enum astNodeType nodeType, union astNodeValue value,
                               struct typeNode* type, enum astNodeFlags flags, int numChildren, ...) {
   va_list children;
   va_start(children, numChildren);
@@ -14,6 +14,8 @@ struct astNode *createAstNode(enum astNodeType nodeType, union astNodeValue valu
     va_end(children);
     return 0;
   } else {
+    node->line = line;
+    node->column = column;
     node->nodeType = nodeType;
     node->value = value;
     node->type = type;
@@ -39,75 +41,76 @@ void printTree(struct astNode *root) {
   if (root == 0) {
     printf("(null)");
   }else {
-  switch (root->nodeType) {
-    case symbolTable: {
-      printf("Symbol table");
-      break;
+    printf("%d:%d: ", root->line, root->column);
+    switch (root->nodeType) {
+      case symbolTable: {
+        printf("Symbol table");
+        break;
+      }
+      case program: {
+        printf("Program");
+        break;
+      }
+      case moduleDeclaration: {
+        printf("module '%s'", root->value.string);
+        break;
+      }
+      case packageDefinition: {
+        printf("package '%s'", root->value.string);
+        break;
+      }
+      case definitions: {
+        printf("definitions");
+        break;
+      }
+      case statements: {
+        printf("Statements");
+        break;
+      }
+      case variableDefinition: {
+        printf("Variable '%s'", root->value.string);
+        break;
+      }
+      case functionDefinition: {
+        printf("Function '%s'", root->value.string);
+        break;
+      }
+      case returnStatement: {
+        printf("Return");
+        break;
+      }
+      case numberExpression: {
+        printf("Number %f", root->value.number);
+        break;
+      }
+      case variableReferenceExpression: {
+        printf("Variable reference '%s'", root->value.string);
+        break;
+      }
+      case assignExpression: {
+        printf("Assign");
+        break;
+      }
+      case addExpression: {
+        printf("Add");
+        break;
+      }
+      case subtractExpression: {
+        printf("Subtract");
+        break;
+      }
+      case multiplyExpression: {
+        printf("Multiply");
+        break;
+      }
+      case divideExpression: {
+        printf("Divide");
+        break;
+      }
+      default:
+        printf("Unknown node type %d", root->type);
+        break;
     }
-  case program: {
-    printf("Program");
-    break;
-  }
-  case moduleDeclaration: {
-    printf("module '%s'", root->value.string);
-    break;
-  }
-  case packageDefinition: {
-    printf("package '%s'", root->value.string);
-    break;
-  }
-  case definitions: {
-    printf("definitions");
-    break;
-  }
-  case statements: {
-    printf("Statements");
-    break;
-  }
-  case variableDefinition: {
-    printf("Variable '%s'", root->value.string);
-    break;
-  }
-  case functionDefinition: {
-    printf("Function '%s'", root->value.string);
-    break;
-  }
-  case returnStatement: {
-    printf("Return");
-    break;
-  }
-  case numberExpression: {
-    printf("Number %f", root->value.number);
-    break;
-  }
-  case variableReferenceExpression: {
-    printf("Variable reference '%s'", root->value.string);
-    break;
-  }
-  case assignExpression: {
-      printf("Assign");
-      break;
-  }
-  case addExpression: {
-      printf("Add");
-      break;
-  }
-  case subtractExpression: {
-    printf("Subtract");
-    break;
-  }
-  case multiplyExpression: {
-    printf("Multiply");
-    break;
-  }
-  case divideExpression: {
-    printf("Divide");
-    break;
-  }
-  default:
-    printf("Unknown node type %d", root->type);
-    break;
-  }
   if (root->numChildren > 0 || root->flags != 0 || root->type != 0) {
     printf(": ");
   }

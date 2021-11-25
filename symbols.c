@@ -11,28 +11,28 @@ int buildSymbolTable(struct astNode **nodePointer,
     struct astNode *nextSymbolTable = previousSymbolTable;
     if (node->nodeType == program) {
       struct astNode *package = node->children[1];
-      nextSymbolTable = createAstNode(
+      nextSymbolTable = createAstNode(-1, -1,
           symbolTable, (union astNodeValue){}, 0, flag_null, 2,
-          createAstNode(package->nodeType, package->value, 0, package->flags, 0),
+          createAstNode(package->line, package->column, package->nodeType, package->value, 0, package->flags, 0),
           previousSymbolTable);
     } else if (node->nodeType == definitions) {
       nextSymbolTable =
-          createAstNode(symbolTable, (union astNodeValue){}, 0, flag_null, 0);
+          createAstNode(-1, -1, symbolTable, (union astNodeValue){}, 0, flag_null, 0);
       for (int i = 0; i < node->numChildren; i++) {
         struct astNode *child = node->children[i];
         addAstNode(&nextSymbolTable,
-                   createAstNode(child->nodeType, child->value, child->type,
+                   createAstNode(child->line, child->column, child->nodeType, child->value, child->type,
                                  child->flags, 0));
       }
       addAstNode(&nextSymbolTable, previousSymbolTable);
     } else if (node->nodeType == statements) {
       nextSymbolTable =
-          createAstNode(symbolTable, (union astNodeValue){}, 0, flag_null, 0);
+          createAstNode(-1, -1, symbolTable, (union astNodeValue){}, 0, flag_null, 0);
       for (int i = 0; i < node->numChildren; i++) {
         struct astNode *child = node->children[i];
         if (child->nodeType == variableDefinition) {
           addAstNode(&nextSymbolTable,
-                     createAstNode(child->nodeType, child->value, child->type,
+                     createAstNode(child->line, child->column, child->nodeType, child->value, child->type,
                                    child->flags, 0));
         }
       }

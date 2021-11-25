@@ -5,14 +5,17 @@
 
 int main(int argc, char **argv) {
   FILE *input;
+  const char *fileName;
   if (argc < 2) {
     input = stdin;
+    fileName = "<stdin>";
   } else {
     input = fopen(argv[1], "r");
+    fileName = argv[1];
   }
   int result;
   struct astNode *ast;
-  result = parse(input, &ast);
+  result = parse(input, fileName, &ast);
   if (argc >= 2) {
     fclose(input);
   }
