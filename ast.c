@@ -25,7 +25,11 @@ struct astNode *createAstNode(const char *fileName, int line, int column,
     node->flags = flags;
     node->numChildren = numChildren;
     for (int i = 0; i < numChildren; i++) {
-      node->children[i] = va_arg(children, struct astNode *);
+      struct astNode* child = va_arg(children, struct astNode *);
+      if (child != 0) {
+        child->parent = node;
+      }
+      node->children[i] = child;
     }
     return node;
   }
@@ -37,6 +41,10 @@ struct astNode *addAstNode(struct astNode **dest, struct astNode *element) {
       realloc(*dest, sizeof(struct astNode) +
                          newElementCount * sizeof(struct astNode *));
   newAstNode->children[newAstNode->numChildren++] = element;
+  for (int i = 0; i < newAstNode->numChildren; i ++) {
+    struct astNode *child = newAstNode->children[i];
+    child->parent = newAstNode;
+  }
   return newAstNode;
 }
 

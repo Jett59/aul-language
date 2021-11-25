@@ -9,7 +9,7 @@ program.out: error.o aul.tab.o lex.yy.o ast.o type.o symbols.o semantics.o main.
 	$(CC) $^ -o $@
 
 %.o: %.c
-	$(CC) -g -c $< -o $@
+	$(CC) -c $< -o $@
 
 %.tab.c: %.y
 	bison -d $^

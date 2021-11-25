@@ -34,6 +34,7 @@ struct astNode {
   const char *fileName;
   int line;
   int column;
+  struct astNode *parent;
   enum astNodeType nodeType;
   union astNodeValue value;
   struct typeNode *type;
