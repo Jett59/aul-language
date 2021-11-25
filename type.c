@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 struct typeNode *createTypeNode(enum typeType type, char *identifier,
                                 struct typeNode *child) {
   struct typeNode *node = malloc(sizeof(struct typeNode));
@@ -58,8 +57,19 @@ void printType(struct typeNode *node) {
 }
 
 int typecmp(struct typeNode *a, struct typeNode *b) {
-  return a == b || (a->type == b->type &&
-                    (a->identifier == b->identifier ||
-                     strcmp(a->identifier, b->identifier) == 0) &&
-                    typecmp(a->child, b->child) == 0) ? 0 : 1;
+  if (a == 0) {
+    if (b == 0) {
+      return 0;
+    } else {
+      return 1;
+    }
+  } else {
+    return (a == b || a == 0 || b == 0 ||
+            (a->type == b->type &&
+             (a->identifier == b->identifier ||
+              strcmp(a->identifier, b->identifier) == 0) &&
+             typecmp(a->child, b->child) == 0))
+               ? 0
+               : 1;
+  }
 }

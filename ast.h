@@ -15,6 +15,7 @@ enum astNodeType {
   returnStatement,
   numberExpression,
   variableReferenceExpression,
+  castExpression,
   assignExpression,
   addExpression,
   subtractExpression,

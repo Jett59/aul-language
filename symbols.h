@@ -5,4 +5,6 @@
 
 int buildSymbolTable(struct astNode** node, struct astNode* previousSymbolTable);
 
+struct astNode* findSymbol(struct astNode* symbolTable, const char* identifier);
+
 #endif

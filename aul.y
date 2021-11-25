@@ -133,6 +133,9 @@ expression: LEFT_PAREN expression RIGHT_PAREN {
 | IDENTIFIER {
     $$ = buildAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, 0, flag_null, 0);
 }
+| type LEFT_PAREN expression RIGHT_PAREN {
+    $$ = buildAstNode(castExpression, (union astNodeValue) {}, $1, flag_null, 1, $3);
+}
 | expression EQUALS expression {
     $$ = buildAstNode(assignExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }

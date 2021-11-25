@@ -1,8 +1,10 @@
 #include "semantics.h"
 #include "ast.h"
 #include "error.h"
+#include "symbols.h"
 #include "type.h"
 #include <stdbool.h>
+
 
 static bool semanticAssert(bool expression, struct astNode *node,
                            const char *message) {
@@ -45,7 +47,8 @@ static int checkTypes(struct astNode *node) {
           return 1;
         }
       } else {
-        if (!semanticAssert(typecmp(node->type, expression->type) == 0, expression,
+        if (!semanticAssert(typecmp(node->type, expression->type) == 0,
+                            expression,
                             "Error: Type of expression does not match type of "
                             "variable")) {
           return 1;
@@ -53,15 +56,27 @@ static int checkTypes(struct astNode *node) {
       }
       break;
     }
+    case variableReferenceExpression: {
+      struct astNode *variableSymbol =
+          findSymbol(node->children[0], node->value.string);
+          if (!semanticAssert(variableSymbol != 0, node, "Referenced variable is not visible in this scope")) {
+            return 1;
+          }else if (!semanticAssert(variableSymbol->nodeType == variableDefinition, node, "Variable reference to non-variable")) {
+            return 1;
+          }else {
+            node->type = variableSymbol->type;
+          }
+          break;
+    }
     case addExpression:
     case subtractExpression:
     case multiplyExpression:
     case divideExpression: {
       if (!semanticAssert(
-              typecmp(node->children[0]->type, node->children[1]->type), node,
-              "Binary operation with parameters of different types")) {
+              typecmp(node->children[0]->type, node->children[1]->type) == 0,
+              node, "Binary operation with parameters of different types")) {
         return 1;
-      }else {
+      } else {
         node->type = node->children[0]->type;
       }
       break;
@@ -86,7 +101,7 @@ int analyseSemantics(struct astNode *node) {
   }
   if (checkTypes(node) != 0) {
     return 1;
-  }else {
+  } else {
     return 0;
   }
 }

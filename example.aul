@@ -5,15 +5,15 @@ export package Circle {
     internal i64 r = 25;
 
     export f64 getArea() {
-        return pi * (r * r);
+        return pi * f64(r * r);
     }
     export f64 getCircumference () {
-        return 2 * pi * r;
+        return 2.0 * pi * f64(r);
     }
-    export incrementCircumference () {
-        circumference = circumference + 1;
+    export incrementRadius() {
+        r = r + 1;
     }
-    export decrementCircumference () {
-        circumference = circumference - 1;
+    export decrementRadius() {
+        r = r - 1;
     }
 }
