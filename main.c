@@ -13,6 +13,10 @@ int main(int argc, char **argv) {
   } else {
     input = fopen(argv[1], "r");
     fileName = argv[1];
+    if (input == 0) {
+      perror("Error openning file");
+      return 1;
+    }
   }
   int result;
   struct astNode *ast;
