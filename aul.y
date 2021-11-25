@@ -28,7 +28,7 @@ extern FILE* yyin;
 
 static const char* fileName;
 
-#define buildAstNode(nodeType, value, type, numChildren, ...)  createAstNode(yyloc.first_line, yyloc.first_column, nodeType, value, type, numChildren, __VA_ARGS__);
+#define buildAstNode(nodeType, value, type, numChildren, ...)  createAstNode(fileName, yyloc.first_line, yyloc.first_column, nodeType, value, type, numChildren, __VA_ARGS__);
 
 %}
 

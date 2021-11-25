@@ -1,6 +1,8 @@
 #include "type.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
 
 struct typeNode *createTypeNode(enum typeType type, char *identifier,
                                 struct typeNode *child) {
@@ -53,4 +55,11 @@ void printType(struct typeNode *node) {
     printf("<null>");
   }
   putchar(' ');
+}
+
+int typecmp(struct typeNode *a, struct typeNode *b) {
+  return a == b || (a->type == b->type &&
+                    (a->identifier == b->identifier ||
+                     strcmp(a->identifier, b->identifier) == 0) &&
+                    typecmp(a->child, b->child) == 0) ? 0 : 1;
 }

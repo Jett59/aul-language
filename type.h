@@ -31,4 +31,6 @@ struct typeNode* createTypeNode(enum typeType type, char* identifier, struct typ
 
 void printType(struct typeNode* node);
 
+int typecmp(struct typeNode* a, struct typeNode* b);
+
 #endif

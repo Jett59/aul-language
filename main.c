@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "aul.tab.h"
+#include "semantics.h"
 #include "symbols.h"
 #include <stdio.h>
 
@@ -22,7 +23,10 @@ int main(int argc, char **argv) {
   if (result == 0) {
     result = buildSymbolTable(&ast, 0);
     if (result == 0) {
-      printTree(ast);
+      result = analyseSemantics(ast);
+      if (result == 0) {
+        printTree(ast);
+      }
     }
   }
   if (result != 0) {
