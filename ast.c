@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct astNode *createAstNode(int line, int column, enum astNodeType nodeType, union astNodeValue value,
+struct astNode *createAstNode(const char* fileName, int line, int column, enum astNodeType nodeType, union astNodeValue value,
                               struct typeNode* type, enum astNodeFlags flags, int numChildren, ...) {
   va_list children;
   va_start(children, numChildren);
@@ -14,6 +14,7 @@ struct astNode *createAstNode(int line, int column, enum astNodeType nodeType, u
     va_end(children);
     return 0;
   } else {
+    node->fileName = fileName;
     node->line = line;
     node->column = column;
     node->nodeType = nodeType;
@@ -41,7 +42,7 @@ void printTree(struct astNode *root) {
   if (root == 0) {
     printf("(null)");
   }else {
-    printf("%d:%d: ", root->line, root->column);
+    printf("%s:%d:%d: ", root->fileName, root->line, root->column);
     switch (root->nodeType) {
       case symbolTable: {
         printf("Symbol table");
@@ -108,7 +109,7 @@ void printTree(struct astNode *root) {
         break;
       }
       default:
-        printf("Unknown node type %d", root->type);
+        printf("Unknown node type %d", root->nodeType);
         break;
     }
   if (root->numChildren > 0 || root->flags != 0 || root->type != 0) {
