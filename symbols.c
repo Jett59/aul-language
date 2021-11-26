@@ -43,6 +43,18 @@ int buildSymbolTable(struct astNode **nodePointer,
         }
       }
       addAstNode(&nextSymbolTable, previousSymbolTable);
+    } else if (node->nodeType == functionDefinition) {
+      struct astNode *arguments = node->children[0];
+      nextSymbolTable = createAstNode(node->fileName, -1, -1, symbolTable,
+                                      (union astNodeValue){}, 0, flag_null, 0);
+      for (int i = 0; i < arguments->numChildren; i++) {
+        struct astNode *arg = arguments->children[i];
+        addAstNode(&nextSymbolTable,
+                   createAstNode(arg->fileName, arg->line, arg->column,
+                                 arg->nodeType, arg->value, arg->type,
+                                 arg->flags, 0));
+      }
+      addAstNode(&nextSymbolTable, previousSymbolTable);
     }
     for (int i = 0; i < node->numChildren; i++) {
       if (buildSymbolTable(&node->children[i], nextSymbolTable) != 0) {
@@ -65,5 +77,6 @@ struct astNode *findSymbol(struct astNode *symbolTable,
       return symbol;
     }
   }
-  return findSymbol(symbolTable->children[symbolTable->numChildren - 1], identifier);
+  return findSymbol(symbolTable->children[symbolTable->numChildren - 1],
+                    identifier);
 }

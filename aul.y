@@ -54,7 +54,7 @@ static const char* fileName;
 %type <number> INTEGER DECIMAL
 
 %type <type> type
-%type <node> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition returnStatement expression
+%type <node> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition argumentList argument returnStatement expression
 %type <flags> visibility scope
 
 %right EQUALS
@@ -104,11 +104,25 @@ variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON
     $$ = buildAstNode(variableDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $6);
 }
 
-functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
-    $$ = buildAstNode(functionDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $8);
+functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
+    $$ = buildAstNode(functionDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 2, $6, $9);
 }
-| visibility scope IDENTIFIER LEFT_PAREN RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
-    $$ = buildAstNode(functionDefinition, (union astNodeValue) {.string = $3}, createTypeNode(TYPE_NONE, 0, 0), $1 | $2, 1, $7);
+| visibility scope IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
+    $$ = buildAstNode(functionDefinition, (union astNodeValue) {.string = $3}, createTypeNode(TYPE_NONE, 0, 0), $1 | $2, 2, $5, $8);
+}
+
+argumentList: argumentList COMMA argument {
+    $$ = addAstNode(&$1, $3);
+}
+| argument {
+    $$ = buildAstNode(argumentList, (union astNodeValue) {}, 0, flag_null, 1, $1);
+}
+| {
+    $$ = buildAstNode(argumentList, (union astNodeValue) {}, 0, flag_null, 0);
+}
+
+argument: type IDENTIFIER {
+    $$ = buildAstNode(variableDefinition, (union astNodeValue) {.string = $2}, $1, flag_null, 0);
 }
 
 returnStatement: RETURN expression SEMICOLON {

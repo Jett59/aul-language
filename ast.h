@@ -11,6 +11,7 @@ enum astNodeType {
   definitions,
   variableDefinition,
   functionDefinition,
+  argumentList,
   statements,
   returnStatement,
   numberExpression,

@@ -86,6 +86,10 @@ void printTree(struct astNode *root) {
       printf("Function '%s'", root->value.string);
       break;
     }
+    case argumentList: {
+      printf("Argument list");
+      break;
+    }
     case returnStatement: {
       printf("Return");
       break;

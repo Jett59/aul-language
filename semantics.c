@@ -68,6 +68,7 @@ static int checkTypes(struct astNode *node) {
       }
       break;
     }
+    case assignExpression:
     case addExpression:
     case subtractExpression:
     case multiplyExpression:
