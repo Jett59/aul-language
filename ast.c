@@ -56,7 +56,7 @@ void printTree(struct astNode *root) {
     switch (root->nodeType) {
     case symbolTable: {
       printf("Symbol table");
-      break;
+      return;
     }
     case program: {
       printf("Program");
