@@ -58,3 +58,6 @@ lex.yy.c
 
 #Visual Studio Code files
 /.vscode/
+
+#Build output
+/build/
