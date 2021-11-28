@@ -3,8 +3,10 @@
 
 #include "ast.h"
 
+namespace aul {
 int buildSymbolTable(astNode** node, astNode* previousSymbolTable);
 
 astNode* findSymbol(astNode* symbolTable, const char* identifier);
+}
 
 #endif

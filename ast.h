@@ -3,6 +3,8 @@
 
 #include "type.h"
 
+namespace aul {
+
 enum astNodeType {
   symbolTable, program, moduleDeclaration, packageDefinition, definitions,
   variableDefinition, functionDefinition, argumentList, statements,
@@ -50,5 +52,6 @@ astNode *createAstNode(const char *fileName, int line, int column,
 astNode *addAstNode(astNode **dest, astNode *element);
 
 void printTree(astNode *root);
+}
 
 #endif

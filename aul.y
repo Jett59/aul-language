@@ -257,5 +257,5 @@ dottedIdentifier: dottedIdentifier DOT IDENTIFIER {
 %%
 
 void aul::Parser::error(aul::location const& location, const std::string& message) {
-    std::cerr << message << std::endl;
+    aul::error(fileName, location.begin.line, location.begin.column, message.c_str());
 }

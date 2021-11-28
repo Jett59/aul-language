@@ -3,6 +3,8 @@
 
 #include <fstream>
 
+#include "location.hh"
+
 #if ! defined(yyFlexLexerOnce)
 #include <FlexLexer.h>
 #endif
@@ -14,10 +16,15 @@
 
 namespace aul {
     class Lexer : public yyFlexLexer {
+        private:
+         location currentLocation;
         public:
         Lexer(std::istream& input) : yyFlexLexer(&input) {}
         ~Lexer() {}
          Parser::symbol_type next();
+         location getLocation() { return currentLocation; }
+        private:
+         void updateLocation(const char* token);
     };
 }
 

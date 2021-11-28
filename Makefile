@@ -52,4 +52,4 @@ lex.yy.cc: aul.l
 	flex $^
 
 clean:
-	rm -rf lex.yy.c aul.tab.* *.o build/
+	rm -rf lex.yy.cc aul.tab.* *.o build/

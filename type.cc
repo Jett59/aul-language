@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+namespace aul {
 typeNode *createTypeNode(typeType type, char *identifier,
                                 typeNode *child) {
   typeNode *node = (typeNode*)malloc(sizeof(typeNode));
@@ -72,4 +73,5 @@ int typecmp(typeNode *a, typeNode *b) {
                ? 0
                : 1;
   }
+}
 }

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+namespace aul {
 int buildSymbolTable(astNode **nodePointer,
                      astNode *previousSymbolTable) {
   astNode *node = *nodePointer;
@@ -79,4 +80,5 @@ astNode *findSymbol(astNode *symbolTable,
   }
   return findSymbol(symbolTable->children[symbolTable->numChildren - 1],
                     identifier);
+}
 }

@@ -13,12 +13,11 @@ extern const char* fileName;
 
 void yyerror(const char* message);
 
-void storeString(void);
-void storeNumber(void);
+#define YY_USER_ACTION updateLocation(yytext);
 
-#define yyterminate()  Parser::make_END(location());
+#define yyterminate()  Parser::make_END(currentLocation);
 
-#define MAKE(TYPE)  Parser::make_ ## TYPE (location())
+#define MAKE(TYPE)  Parser::make_ ## TYPE (currentLocation)
 
 %}
 
@@ -58,9 +57,9 @@ void storeNumber(void);
 "f64"  return MAKE(F64);
 "ptr"  return MAKE(PTR);
 
-[a-zA-Z\_][a-zA-Z\_0-9]*   return Parser::make_IDENTIFIER(yytext, location());
-[0-9]+"."[0-9]+   return Parser::make_DECIMAL(atof(yytext), location());
-[0-9]+  return Parser::make_INTEGER(atof(yytext), location());
+[a-zA-Z\_][a-zA-Z\_0-9]*   return Parser::make_IDENTIFIER(yytext, currentLocation);
+[0-9]+"."[0-9]+   return Parser::make_DECIMAL(atof(yytext), currentLocation);
+[0-9]+  return Parser::make_INTEGER(atof(yytext), currentLocation);
 
 "("  return MAKE(LEFT_PAREN);
 ")"  return MAKE(RIGHT_PAREN);
@@ -84,3 +83,17 @@ void storeNumber(void);
 .  return yyterminate()
 
 %%
+
+void aul::Lexer::updateLocation(const char* token) {
+    currentLocation.begin = currentLocation.end;
+    int tokenLength = strlen(token);
+    for (int i = 0; i < tokenLength; i ++) {
+        char c = token[i];
+        if (c == '\n') {
+            currentLocation.end.line++;
+            currentLocation.end.column = 1;
+        }else {
+            currentLocation.end.column++;
+        }
+    }
+}

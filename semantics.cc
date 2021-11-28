@@ -5,6 +5,7 @@
 #include "type.h"
 #include <stdbool.h>
 
+namespace aul {
 static bool semanticAssert(bool expression, struct astNode *node,
                            const char *message) {
   if (!expression) {
@@ -117,4 +118,5 @@ int analyseSemantics(struct astNode *node) {
   } else {
     return 0;
   }
+}
 }

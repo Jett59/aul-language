@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+namespace aul {
 astNode *createAstNode(const char *fileName, int line, int column,
                               astNodeType nodeType,
                               astNodeValue value, typeNode *type,
@@ -158,4 +159,5 @@ void printTree(astNode *root) {
     }
   }
   printf("\n");
+}
 }
