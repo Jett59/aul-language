@@ -1,6 +1,7 @@
 #ifndef AUL_TYPE_H
 #define AUL_TYPE_H
 
+namespace aul {
 enum typeType {
     TYPE_NONE,
     TYPE_BOOLEAN,
@@ -32,5 +33,6 @@ struct typeNode* createTypeNode(enum typeType type, char* identifier, struct typ
 void printType(struct typeNode* node);
 
 int typecmp(struct typeNode* a, struct typeNode* b);
+}
 
 #endif

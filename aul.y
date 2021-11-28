@@ -1,46 +1,53 @@
+%define api.token.constructor
+%define api.value.type variant
+
+%define api.namespace { aul }
+
+%define api.parser.class  { Parser }
+
 %code requires {
     #include "ast.h"
     #include "type.h"
     #include <stdio.h>
 
-    int parse(FILE* input, const char* file, struct astNode** ast);
+    namespace aul {
+        class Lexer;
+    }
 }
 
 %debug
 
 %locations
 
+%define parse.error verbose
+
 %{
 
-#define YYERROR_VERBOSE 1
-
 #include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
 
+#include "lexer.h"
+
 void yyerror(const char* message);
-int yylex();
 
-static struct astNode* astRoot;
+#define buildAstNode(location, nodeType, value, type, numChildren, ...)  createAstNode(fileName, location.begin.line, location.begin.column, nodeType, value, type, numChildren, __VA_ARGS__);
 
-extern FILE* yyin;
-
-static const char* fileName;
-
-#define buildAstNode(nodeType, value, type, numChildren, ...)  createAstNode(fileName, yyloc.first_line, yyloc.first_column, nodeType, value, type, numChildren, __VA_ARGS__);
+aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
+    return lexer.next();
+}
 
 %}
 
-%union {
-    char* string;
-    double number;
-    enum astNodeFlags flags;
-    struct astNode* node;
-    struct typeNode* type;
-}
+%lex-param { aul::Lexer& lexer }
+%parse-param { aul::Lexer& lexer }
+%parse-param { const char* fileName }
+%parse-param { astNode** ast }
 
-%token IDENTIFIER INTEGER DECIMAL
+%token <char*> IDENTIFIER 
+%token <double> INTEGER DECIMAL
 %token LEFT_PAREN RIGHT_PAREN LEFT_BRACKET RIGHT_BRACKET LEFT_BRACE RIGHT_BRACE EQUALS COMMA DOT SEMICOLON
 %token LESS_THAN GREATER_THAN PLUS MINUS MULTIPLY DIVIDE
 %token MODULE PACKAGE
@@ -50,12 +57,12 @@ static const char* fileName;
 %token BOOLEAN CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
 %token TRUE FALSE
 
-%type <string> IDENTIFIER dottedIdentifier
-%type <number> INTEGER DECIMAL
+%token END  0
 
-%type <type> type
-%type <node> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition argumentList argument returnStatement expression
-%type <flags> visibility scope
+%nterm <char*> dottedIdentifier
+%nterm <typeNode*> type
+%type <astNode*> program moduleDeclaration packageDefinition definitions definition statement statements localVariableDefinition variableDefinition functionDefinition argumentList argument returnStatement expression
+%type <astNodeFlags> visibility scope
 
 %right EQUALS
 %left PLUS MINUS
@@ -66,23 +73,23 @@ static const char* fileName;
 %%
 
 program: moduleDeclaration packageDefinition {
-    $$ = buildAstNode(program, (union astNodeValue) {}, 0, flag_null, 2, $1, $2);
-    astRoot = $$;
+    $$ = buildAstNode(@$, program, (union astNodeValue) {}, 0, flag_null, 2, $1, $2);
+    *ast = $$;
 }
 
 moduleDeclaration: MODULE dottedIdentifier SEMICOLON {
-    $$ = buildAstNode(moduleDeclaration, (union astNodeValue) {.string = $2}, 0, flag_null, 0);
+    $$ = buildAstNode(@$, moduleDeclaration, (union astNodeValue) {.string = $2}, 0, flag_null, 0);
 }
 
 packageDefinition: visibility PACKAGE IDENTIFIER LEFT_BRACE definitions RIGHT_BRACE {
-    $$ = buildAstNode(packageDefinition, (union astNodeValue) {.string = $3}, 0, $1, 1, $5);
+    $$ = buildAstNode(@$, packageDefinition, (union astNodeValue) {.string = $3}, 0, $1, 1, $5);
 }
 
 definitions: definitions definition {
     $$ = addAstNode(&$1, $2);
 }
 | {
-    $$ = buildAstNode(definitions, (union astNodeValue) {}, 0, flag_null, 0);
+    $$ = buildAstNode(@$, definitions, (union astNodeValue) {}, 0, flag_null, 0);
 }
 
 definition: variableDefinition | functionDefinition;
@@ -91,79 +98,79 @@ statements: statements statement {
     $$ = addAstNode(&$1, $2);
 }
 | {
-    $$ = buildAstNode(statements, (union astNodeValue) {}, 0, flag_null, 0);
+    $$ = buildAstNode(@$, statements, (union astNodeValue) {}, 0, flag_null, 0);
 }
 
 statement: returnStatement | expression SEMICOLON | localVariableDefinition;
 
 localVariableDefinition: type IDENTIFIER EQUALS expression SEMICOLON {
-    $$ = buildAstNode(variableDefinition, (union astNodeValue) {.string = $2}, $1, flag_null, 1, $4);
+    $$ = buildAstNode(@$, variableDefinition, (union astNodeValue) {.string = $2}, $1, flag_null, 1, $4);
 }
 
 variableDefinition: visibility scope type IDENTIFIER EQUALS expression SEMICOLON {
-    $$ = buildAstNode(variableDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $6);
+    $$ = buildAstNode(@$, variableDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 1, $6);
 }
 
 functionDefinition: visibility scope type IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
-    $$ = buildAstNode(functionDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 2, $6, $9);
+    $$ = buildAstNode(@$, functionDefinition, (union astNodeValue) {.string = $4}, $3, $1 | $2, 2, $6, $9);
 }
 | visibility scope IDENTIFIER LEFT_PAREN argumentList RIGHT_PAREN LEFT_BRACE statements RIGHT_BRACE {
-    $$ = buildAstNode(functionDefinition, (union astNodeValue) {.string = $3}, createTypeNode(TYPE_NONE, 0, 0), $1 | $2, 2, $5, $8);
+    $$ = buildAstNode(@$, functionDefinition, (union astNodeValue) {.string = $3}, createTypeNode(TYPE_NONE, 0, 0), $1 | $2, 2, $5, $8);
 }
 
 argumentList: argumentList COMMA argument {
     $$ = addAstNode(&$1, $3);
 }
 | argument {
-    $$ = buildAstNode(argumentList, (union astNodeValue) {}, 0, flag_null, 1, $1);
+    $$ = buildAstNode(@$, argumentList, (union astNodeValue) {}, 0, flag_null, 1, $1);
 }
 | {
-    $$ = buildAstNode(argumentList, (union astNodeValue) {}, 0, flag_null, 0);
+    $$ = buildAstNode(@$, argumentList, (union astNodeValue) {}, 0, flag_null, 0);
 }
 
 argument: type IDENTIFIER {
-    $$ = buildAstNode(variableDefinition, (union astNodeValue) {.string = $2}, $1, flag_null, 0);
+    $$ = buildAstNode(@$, variableDefinition, (union astNodeValue) {.string = $2}, $1, flag_null, 0);
 }
 
 returnStatement: RETURN expression SEMICOLON {
-    $$ = buildAstNode(returnStatement, (union astNodeValue) {}, 0, flag_null, 1, $2);
+    $$ = buildAstNode(@$, returnStatement, (union astNodeValue) {}, 0, flag_null, 1, $2);
 }
 
 expression: LEFT_PAREN expression RIGHT_PAREN {
     $$ = $2;
 }
 | DECIMAL {
-    $$ = buildAstNode(numberExpression, (union astNodeValue) {.number = $1}, createTypeNode(TYPE_F64, 0, 0), flag_null, 0);
+    $$ = buildAstNode(@$, numberExpression, (union astNodeValue) {.number = $1}, createTypeNode(TYPE_F64, 0, 0), flag_null, 0);
 }
 | INTEGER {
-    $$ = buildAstNode(numberExpression, (union astNodeValue) {.number = $1}, createTypeNode(TYPE_I64, 0, 0), flag_null, 0);
+    $$ = buildAstNode(@$, numberExpression, (union astNodeValue) {.number = $1}, createTypeNode(TYPE_I64, 0, 0), flag_null, 0);
 }
 | TRUE {
-    $$ = buildAstNode(numberExpression, (union astNodeValue) {.number = 1}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
+    $$ = buildAstNode(@$, numberExpression, (union astNodeValue) {.number = 1}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
 }
 | FALSE {
-    $$ = buildAstNode(numberExpression, (union astNodeValue) {.number = 0}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
+    $$ = buildAstNode(@$, numberExpression, (union astNodeValue) {.number = 0}, createTypeNode(TYPE_BOOLEAN, 0, 0), flag_null, 0);
 }
 | IDENTIFIER {
-    $$ = buildAstNode(variableReferenceExpression, (union astNodeValue) {.string = $1}, 0, flag_null, 0);
+    $$ = buildAstNode(@$, variableReferenceExpression, (union astNodeValue) {.string = $1}, 0, flag_null, 0);
 }
 | type LEFT_PAREN expression RIGHT_PAREN {
-    $$ = buildAstNode(castExpression, (union astNodeValue) {}, $1, flag_null, 1, $3);
+    $$ = buildAstNode(@$, castExpression, (union astNodeValue) {}, $1, flag_null, 1, $3);
 }
 | expression EQUALS expression {
-    $$ = buildAstNode(assignExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+    $$ = buildAstNode(@$, assignExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 | expression PLUS expression {
-    $$ = buildAstNode(addExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+    $$ = buildAstNode(@$, addExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 | expression MINUS expression {
-    $$ = buildAstNode(subtractExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+    $$ = buildAstNode(@$, subtractExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 | expression MULTIPLY expression {
-    $$ = buildAstNode(multiplyExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+    $$ = buildAstNode(@$, multiplyExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 | expression DIVIDE expression {
-    $$ = buildAstNode(divideExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
+    $$ = buildAstNode(@$, divideExpression, (union astNodeValue) {}, 0, flag_null, 2, $1, $3);
 }
 
 type: IDENTIFIER {
@@ -236,7 +243,7 @@ scope: STATIC {
 }
 
 dottedIdentifier: dottedIdentifier DOT IDENTIFIER {
-    char* newStr = malloc(strlen($1) + strlen($3) + 2);
+    char* newStr = (char*)malloc(strlen($1) + strlen($3) + 2);
     strcpy(newStr, $1);
     char dotChar = '.';
     strncat(newStr, &dotChar, 1);
@@ -249,20 +256,6 @@ dottedIdentifier: dottedIdentifier DOT IDENTIFIER {
 
 %%
 
-void yyerror(const char* message) {
-    error(fileName, yylloc.first_line, yylloc.first_column, message);
-}
-
-int parse(FILE* input, const char* file, struct astNode** ast) {
-    const char* shouldDebug = getenv("AUL_PARSE_DEBUG");
-    if (shouldDebug != 0 && strcmp(shouldDebug, "y") == 0) {
-        yydebug = 1;
-    }else {
-        yydebug = 0;
-    }
-    yyin = input;
-    fileName = file;
-    int parseResult = yyparse();
-    *ast = astRoot;
-        return parseResult;
+void aul::Parser::error(aul::location const& location, const std::string& message) {
+    aul::error(fileName, location.begin.line, location.begin.column, message.c_str());
 }

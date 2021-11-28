@@ -1,28 +1,39 @@
 #include "ast.h"
-#include "aul.tab.h"
+#include "lexer.h"
+#include "aul.tab.hh"
 #include "semantics.h"
 #include "symbols.h"
-#include <stdio.h>
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+
+using namespace aul;
+
+using std::istream;
 
 int main(int argc, char **argv) {
-  FILE *input;
+  istream *input;
+  std::ifstream fileInput;
   const char *fileName;
   if (argc < 2) {
-    input = stdin;
+    input = &std::cin;
     fileName = "<stdin>";
   } else {
-    input = fopen(argv[1], "r");
+    fileInput = std::ifstream(argv[1]);
+    input = &fileInput;
     fileName = argv[1];
-    if (input == 0) {
+    if (!fileInput) {
       perror("Error openning file");
       return 1;
     }
   }
+  Lexer lexer(*input);
+  astNode *ast;
+  Parser parser(lexer, fileName, &ast);
   int result;
-  struct astNode *ast;
-  result = parse(input, fileName, &ast);
-  if (argc >= 2) {
-    fclose(input);
+  result = parser();
+  if (argc > 1) {
+    fileInput.close();
   }
   if (result == 0) {
     result = buildSymbolTable(&ast, 0);
@@ -34,7 +45,7 @@ int main(int argc, char **argv) {
     }
   }
   if (result != 0) {
-    fprintf(stderr, "Compilation aborted.");
+    fprintf(stderr, "Compilation aborted.\n");
   }
   return result;
 }

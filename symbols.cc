@@ -3,15 +3,16 @@
 #include <stdio.h>
 #include <string.h>
 
-int buildSymbolTable(struct astNode **nodePointer,
-                     struct astNode *previousSymbolTable) {
-  struct astNode *node = *nodePointer;
+namespace aul {
+int buildSymbolTable(astNode **nodePointer,
+                     astNode *previousSymbolTable) {
+  astNode *node = *nodePointer;
   if (node->nodeType == symbolTable) {
     return 0;
   } else {
-    struct astNode *nextSymbolTable = previousSymbolTable;
+    astNode *nextSymbolTable = previousSymbolTable;
     if (node->nodeType == program) {
-      struct astNode *package = node->children[1];
+      astNode *package = node->children[1];
       nextSymbolTable =
           createAstNode(node->fileName, -1, -1, symbolTable,
                         (union astNodeValue){}, 0, flag_null, 2,
@@ -23,7 +24,7 @@ int buildSymbolTable(struct astNode **nodePointer,
       nextSymbolTable = createAstNode(node->fileName, -1, -1, symbolTable,
                                       (union astNodeValue){}, 0, flag_null, 0);
       for (int i = 0; i < node->numChildren; i++) {
-        struct astNode *child = node->children[i];
+        astNode *child = node->children[i];
         addAstNode(&nextSymbolTable,
                    createAstNode(child->fileName, child->line, child->column,
                                  child->nodeType, child->value, child->type,
@@ -34,7 +35,7 @@ int buildSymbolTable(struct astNode **nodePointer,
       nextSymbolTable = createAstNode(node->fileName, -1, -1, symbolTable,
                                       (union astNodeValue){}, 0, flag_null, 0);
       for (int i = 0; i < node->numChildren; i++) {
-        struct astNode *child = node->children[i];
+        astNode *child = node->children[i];
         if (child->nodeType == variableDefinition) {
           addAstNode(&nextSymbolTable,
                      createAstNode(child->fileName, child->line, child->column,
@@ -44,11 +45,11 @@ int buildSymbolTable(struct astNode **nodePointer,
       }
       addAstNode(&nextSymbolTable, previousSymbolTable);
     } else if (node->nodeType == functionDefinition) {
-      struct astNode *arguments = node->children[0];
+      astNode *arguments = node->children[0];
       nextSymbolTable = createAstNode(node->fileName, -1, -1, symbolTable,
                                       (union astNodeValue){}, 0, flag_null, 0);
       for (int i = 0; i < arguments->numChildren; i++) {
-        struct astNode *arg = arguments->children[i];
+        astNode *arg = arguments->children[i];
         addAstNode(&nextSymbolTable,
                    createAstNode(arg->fileName, arg->line, arg->column,
                                  arg->nodeType, arg->value, arg->type,
@@ -66,17 +67,18 @@ int buildSymbolTable(struct astNode **nodePointer,
   }
 }
 
-struct astNode *findSymbol(struct astNode *symbolTable,
+astNode *findSymbol(astNode *symbolTable,
                            const char *identifier) {
-  if (symbolTable == 0) {
-    return 0;
+  if (symbolTable == nullptr) {
+    return nullptr;
   }
   for (int i = 0; i < symbolTable->numChildren - 1; i++) {
-    struct astNode *symbol = symbolTable->children[i];
+    astNode *symbol = symbolTable->children[i];
     if (strcmp(symbol->value.string, identifier) == 0) {
       return symbol;
     }
   }
   return findSymbol(symbolTable->children[symbolTable->numChildren - 1],
                     identifier);
+}
 }
