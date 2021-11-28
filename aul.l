@@ -19,6 +19,8 @@ void yyerror(const char* message);
 
 #define MAKE(TYPE)  Parser::make_ ## TYPE (currentLocation)
 
+static char* copyOf(const char* s);
+
 %}
 
 %option c++
@@ -57,7 +59,7 @@ void yyerror(const char* message);
 "f64"  return MAKE(F64);
 "ptr"  return MAKE(PTR);
 
-[a-zA-Z\_][a-zA-Z\_0-9]*   return Parser::make_IDENTIFIER(yytext, currentLocation);
+[a-zA-Z\_][a-zA-Z\_0-9]*   return Parser::make_IDENTIFIER(copyOf(yytext), currentLocation);
 [0-9]+"."[0-9]+   return Parser::make_DECIMAL(atof(yytext), currentLocation);
 [0-9]+  return Parser::make_INTEGER(atof(yytext), currentLocation);
 
@@ -80,7 +82,7 @@ void yyerror(const char* message);
 "*"  return MAKE(MULTIPLY);
 "/"  return MAKE(DIVIDE);
 
-.  return yyterminate()
+.  return yyterminate();
 
 %%
 
@@ -96,4 +98,10 @@ void aul::Lexer::updateLocation(const char* token) {
             currentLocation.end.column++;
         }
     }
+}
+
+static char* copyOf(const char* s) {
+    char* newS = new char [strlen(s) + 1];
+    strcpy(newS, s);
+    return newS;
 }
