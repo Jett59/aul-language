@@ -33,12 +33,6 @@
 
 void yyerror(const char* message);
 
-static struct astNode* astRoot;
-
-extern FILE* yyin;
-
-static const char* fileName;
-
 #define buildAstNode(location, nodeType, value, type, numChildren, ...)  createAstNode(fileName, location.begin.line, location.begin.column, nodeType, value, type, numChildren, __VA_ARGS__);
 
 aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
@@ -49,6 +43,8 @@ aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
 
 %lex-param { aul::Lexer& lexer }
 %parse-param { aul::Lexer& lexer }
+%parse-param { const char* fileName }
+%parse-param { astNode** ast }
 
 %token <char*> IDENTIFIER 
 %token <double> INTEGER DECIMAL
@@ -78,7 +74,7 @@ aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
 
 program: moduleDeclaration packageDefinition {
     $$ = buildAstNode(@$, program, (union astNodeValue) {}, 0, flag_null, 2, $1, $2);
-    astRoot = $$;
+    *ast = $$;
 }
 
 moduleDeclaration: MODULE dottedIdentifier SEMICOLON {

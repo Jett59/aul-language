@@ -780,7 +780,7 @@ switch (yytype)
     };
 
     /// Build a parser object.
-     Parser  (aul::Lexer& lexer_yyarg);
+     Parser  (aul::Lexer& lexer_yyarg, const char* fileName_yyarg, astNode** ast_yyarg);
     virtual ~ Parser  ();
 
     /// Parse.  An alias for parse ().
@@ -1553,7 +1553,7 @@ switch (yytype)
     static const char* const yytname_[];
 #if YYDEBUG
     // YYRLINE[YYN] -- Source line where rule number YYN was defined.
-    static const short yyrline_[];
+    static const unsigned char yyrline_[];
     /// Report on the debug stream that the rule \a r is going to be reduced.
     virtual void yy_reduce_print_ (int r);
     /// Print the state stack on the debug stream.
@@ -1789,6 +1789,8 @@ switch (yytype)
 
     // User arguments.
     aul::Lexer& lexer;
+    const char* fileName;
+    astNode** ast;
   };
 
   inline
@@ -2054,7 +2056,7 @@ switch (yytype)
 
 #line 4 "aul.y"
 } //  aul 
-#line 2058 "aul.tab.hh"
+#line 2060 "aul.tab.hh"
 
 
 

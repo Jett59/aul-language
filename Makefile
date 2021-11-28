@@ -25,8 +25,7 @@ PROGRAM:=build/bin/aulc$(program-suffix)
 LIBNAME:=aul
 LIB:=build/lib/libaul$(shared-library-suffix)
 
-CFLAGS:=-fPIC -std=gnu11
-CXXFLAGS:=-fPIC -std=gnu++17
+CXXFLAGS:=-fPIC -std=gnu++17 -g
 LDFLAGS:=-Lbuild/lib
 
 ifneq ($(OS),Windows_NT)
@@ -40,11 +39,11 @@ endif
 $(PROGRAM): $(LIB) $(PROGRAM-OBJS)
 	mkdir -p build/bin
 	cp $(LIB) build/bin/
-	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(PROGRAM-OBJS) -laul
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(PROGRAM-OBJS) -laul
 
 $(LIB): $(LIB-OBJS)
 	mkdir -p build/lib
-	$(CXX) $(CFLAGS) $(LDFLAGS) -shared $^ -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $^ -o $@
 
 %.tab.cc: %.y
 	bison -d --language=c++ $^

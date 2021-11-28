@@ -1,6 +1,8 @@
 #ifndef AUL_LEXER_H
 #define AUL_LEXER_H
 
+#include <fstream>
+
 #if ! defined(yyFlexLexerOnce)
 #include <FlexLexer.h>
 #endif
@@ -13,7 +15,7 @@
 namespace aul {
     class Lexer : public yyFlexLexer {
         public:
-        Lexer() {}
+        Lexer(std::istream& input) : yyFlexLexer(&input) {}
         ~Lexer() {}
          Parser::symbol_type next();
     };

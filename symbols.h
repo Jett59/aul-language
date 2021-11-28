@@ -3,8 +3,8 @@
 
 #include "ast.h"
 
-int buildSymbolTable(struct astNode** node, struct astNode* previousSymbolTable);
+int buildSymbolTable(astNode** node, astNode* previousSymbolTable);
 
-struct astNode* findSymbol(struct astNode* symbolTable, const char* identifier);
+astNode* findSymbol(astNode* symbolTable, const char* identifier);
 
 #endif
