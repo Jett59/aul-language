@@ -1,4 +1,5 @@
 CC=clang
+CXX=clang++
 
 program-suffix:=
 
@@ -7,6 +8,7 @@ ifeq ($(OS),Windows_NT)
   shared-library-suffix:=.dll
 # Use gcc instead of clang on windows because it has better posix support
   CC=gcc
+  CXX=g++
   else ifeq ($(shell uname -s),Darwin)
     shared-library-suffix:=.dylib
 	else
@@ -24,6 +26,7 @@ LIBNAME:=aul
 LIB:=build/lib/libaul$(shared-library-suffix)
 
 CFLAGS:=-fPIC -std=gnu11
+CXXFLAGS:=-fPIC -std=gnu++17
 LDFLAGS:=-Lbuild/lib
 
 ifneq ($(OS),Windows_NT)
@@ -37,16 +40,16 @@ endif
 $(PROGRAM): $(LIB) $(PROGRAM-OBJS)
 	mkdir -p build/bin
 	cp $(LIB) build/bin/
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(PROGRAM-OBJS) -laul
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(PROGRAM-OBJS) -laul
 
 $(LIB): $(LIB-OBJS)
 	mkdir -p build/lib
-	$(CC) $(CFLAGS) $(LDFLAGS) -shared $^ -o $@
+	$(CXX) $(CFLAGS) $(LDFLAGS) -shared $^ -o $@
 
-%.tab.c: %.y
-	bison -d $^
+%.tab.cc: %.y
+	bison -d --language=c++ $^
 
-lex.yy.c: aul.l
+lex.yy.cc: aul.l
 	flex $^
 
 clean:

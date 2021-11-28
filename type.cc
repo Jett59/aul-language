@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct typeNode *createTypeNode(enum typeType type, char *identifier,
-                                struct typeNode *child) {
-  struct typeNode *node = malloc(sizeof(struct typeNode));
-  if (node != 0) {
+typeNode *createTypeNode(typeType type, char *identifier,
+                                typeNode *child) {
+  typeNode *node = (typeNode*)malloc(sizeof(typeNode));
+  if (node != nullptr) {
     node->type = type;
     node->identifier = identifier;
     node->child = child;
@@ -14,9 +14,9 @@ struct typeNode *createTypeNode(enum typeType type, char *identifier,
   return node;
 }
 
-void printType(struct typeNode *node) {
-  if (node != 0) {
-    enum typeType type = node->type;
+void printType(typeNode *node) {
+  if (node != nullptr) {
+    typeType type = node->type;
     if (type == TYPE_NONE) {
       printf("<none>");
     } else if (type == TYPE_BOOLEAN) {
@@ -56,9 +56,9 @@ void printType(struct typeNode *node) {
   putchar(' ');
 }
 
-int typecmp(struct typeNode *a, struct typeNode *b) {
-  if (a == 0) {
-    if (b == 0) {
+int typecmp(typeNode *a, typeNode *b) {
+  if (a == nullptr) {
+    if (b == nullptr) {
       return 0;
     } else {
       return 1;

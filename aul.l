@@ -1,10 +1,13 @@
+%option nodefault
 %option noyywrap
 
 %{
 
 #include <stdlib.h>
-#include "aul.tab.h"
+#include "aul.tab.hh"
+#include "location.hh"
 #include "error.h"
+#include "lexer.h"
 
 extern const char* fileName;
 
@@ -13,13 +16,14 @@ void yyerror(const char* message);
 void storeString(void);
 void storeNumber(void);
 
-static void updateLocation();
+#define yyterminate()  Parser::make_END(location());
 
-#define YY_USER_ACTION updateLocation();
+#define MAKE(TYPE)  Parser::make_ ## TYPE (location())
 
 %}
 
-%option bison-locations
+%option c++
+%option yyclass="Lexer"
 
 %%
 
@@ -27,80 +31,56 @@ static void updateLocation();
 
 "\n"|" "|"\t"   ;
 
-"export"  return EXPORT;
-"internal"  return INTERNAL;
-"static"  return STATIC;
-"instance"  return INSTANCE;
-"module"  return MODULE;
-"package"  return PACKAGE;
-"return"  return RETURN;
+"export"  return MAKE(EXPORT);
+"internal"  return MAKE(INTERNAL);
+"static"  return MAKE(STATIC);
+"instance"  return MAKE(INSTANCE);
+"module"  return MAKE(MODULE);
+"package"  return MAKE(PACKAGE);
+"return"  return MAKE(RETURN);
 
-"true"  return TRUE;
-"false"  return FALSE;
+"true"  return MAKE(TRUE);
+"false"  return MAKE(FALSE);
 
-"boolean"  return BOOLEAN;
-"char"  return CHAR;
-"i8"  return I8;
-"i16"  return I16;
-"i32"  return I32;
-"i64"  return I64;
-"isize"  return ISIZE;
-"u8"  return U8;
-"u16"  return U16;
-"u32"  return U32;
-"u64"  return U64;
-"usize"  return USIZE;
-"f32"  return F32;
-"f64"  return F64;
-"ptr"  return PTR;
+"boolean"  return MAKE(BOOLEAN);
+"char"  return MAKE(CHAR);
+"i8"  return MAKE(I8);
+"i16"  return MAKE(I16);
+"i32"  return MAKE(I32);
+"i64"  return MAKE(I64);
+"isize"  return MAKE(ISIZE);
+"u8"  return MAKE(U8);
+"u16"  return MAKE(U16);
+"u32"  return MAKE(U32);
+"u64"  return MAKE(U64);
+"usize"  return MAKE(USIZE);
+"f32"  return MAKE(F32);
+"f64"  return MAKE(F64);
+"ptr"  return MAKE(PTR);
 
-[a-zA-Z\_][a-zA-Z\_0-9]*   storeString(); return IDENTIFIER;
-[0-9]+"."[0-9]+   storeNumber(); return DECIMAL;
-[0-9]+   storeNumber(); return INTEGER;
+[a-zA-Z\_][a-zA-Z\_0-9]*   return Parser::make_IDENTIFIER(yytext, location());
+[0-9]+"."[0-9]+   return Parser::make_DECIMAL(atof(yytext), location());
+[0-9]+  return Parser::make_INTEGER(atof(yytext), location());
 
-"("  return LEFT_PAREN;
-")"  return RIGHT_PAREN;
-"["  return LEFT_BRACKET;
-"]"  return RIGHT_BRACKET;
-"{"  return LEFT_BRACE;
-"}"  return RIGHT_BRACE;
-"="  return EQUALS;
-","  return COMMA;
-"."  return DOT;
-";"  return SEMICOLON;
+"("  return MAKE(LEFT_PAREN);
+")"  return MAKE(RIGHT_PAREN);
+"["  return MAKE(LEFT_BRACKET);
+"]"  return MAKE(RIGHT_BRACKET);
+"{"  return MAKE(LEFT_BRACE);
+"}"  return MAKE(RIGHT_BRACE);
+"="  return MAKE(EQUALS);
+","  return MAKE(COMMA);
+"."  return MAKE(DOT);
+";"  return MAKE(SEMICOLON);
 
-"<"  return LESS_THAN;
-">"  return GREATER_THAN;
+"<"  return MAKE(LESS_THAN);
+">"  return MAKE(GREATER_THAN);
 
-"+"  return PLUS;
-"-"  return MINUS;
-"*"  return MULTIPLY;
-"/"  return DIVIDE;
+"+"  return MAKE(PLUS);
+"-"  return MAKE(MINUS);
+"*"  return MAKE(MULTIPLY);
+"/"  return MAKE(DIVIDE);
 
-.   yyerror("Unknown character"); return 0;
+.  return yyterminate()
 
 %%
-
-void storeString(void) {
-    char* newString = malloc(strlen(yytext) + 1);
-    strcpy(newString, yytext);
-    yylval.string = newString;
-}
-
-void storeNumber(void) {
-    yylval.number = atof(yytext);
-}
-
-static void updateLocation() {
-    yylloc.first_line = yylloc.last_line;
-    yylloc.first_column = yylloc.last_column;
-    int yytextLen = strlen(yytext);
-    for (int i = 0; i < yytextLen; i ++) {
-        if (yytext[i] == '\n') {
-            yylloc.last_line++;
-            yylloc.last_column = 1;
-        }else {
-            yylloc.last_column++;
-        }
-    }
-}

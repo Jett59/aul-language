@@ -1,8 +1,11 @@
 #include "ast.h"
-#include "aul.tab.h"
+#include "lexer.h"
+#include "aul.tab.hh"
 #include "semantics.h"
 #include "symbols.h"
 #include <stdio.h>
+
+using namespace aul;
 
 int main(int argc, char **argv) {
   FILE *input;
@@ -18,9 +21,11 @@ int main(int argc, char **argv) {
       return 1;
     }
   }
+  Lexer lexer;
+  Parser parser(lexer);
   int result;
-  struct astNode *ast;
-  result = parse(input, fileName, &ast);
+  astNode *ast;
+  result = parser();
   if (argc >= 2) {
     fclose(input);
   }
@@ -34,7 +39,7 @@ int main(int argc, char **argv) {
     }
   }
   if (result != 0) {
-    fprintf(stderr, "Compilation aborted.");
+    fprintf(stderr, "Compilation aborted.\n");
   }
   return result;
 }

@@ -4,15 +4,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct astNode *createAstNode(const char *fileName, int line, int column,
-                              enum astNodeType nodeType,
-                              union astNodeValue value, struct typeNode *type,
-                              enum astNodeFlags flags, int numChildren, ...) {
+astNode *createAstNode(const char *fileName, int line, int column,
+                              astNodeType nodeType,
+                              astNodeValue value, typeNode *type,
+                              astNodeFlags flags, int numChildren, ...) {
   va_list children;
   va_start(children, numChildren);
-  struct astNode *node =
-      malloc(sizeof(struct astNode) + numChildren * sizeof(struct astNode *));
-  if (node == 0) {
+  astNode *node =
+      (astNode*)malloc(sizeof(astNode) + numChildren * sizeof(astNode *));
+  if (node == nullptr) {
     va_end(children);
     return 0;
   } else {
@@ -25,8 +25,8 @@ struct astNode *createAstNode(const char *fileName, int line, int column,
     node->flags = flags;
     node->numChildren = numChildren;
     for (int i = 0; i < numChildren; i++) {
-      struct astNode* child = va_arg(children, struct astNode *);
-      if (child != 0) {
+      astNode* child = va_arg(children, struct astNode *);
+      if (child != nullptr) {
         child->parent = node;
       }
       node->children[i] = child;
@@ -35,21 +35,23 @@ struct astNode *createAstNode(const char *fileName, int line, int column,
   }
 }
 
-struct astNode *addAstNode(struct astNode **dest, struct astNode *element) {
+astNode *addAstNode(astNode **dest, astNode *element) {
   int newElementCount = (*dest)->numChildren + 1;
-  struct astNode *newAstNode = *dest =
-      realloc(*dest, sizeof(struct astNode) +
-                         newElementCount * sizeof(struct astNode *));
+  astNode *newAstNode = *dest =
+      (astNode*)realloc(*dest, sizeof(astNode) +
+                         newElementCount * sizeof(astNode *));
   newAstNode->children[newAstNode->numChildren++] = element;
   for (int i = 0; i < newAstNode->numChildren; i ++) {
-    struct astNode *child = newAstNode->children[i];
+    astNode *child = newAstNode->children[i];
+    if (child != nullptr) {
     child->parent = newAstNode;
+    }
   }
   return newAstNode;
 }
 
-void printTree(struct astNode *root) {
-  if (root == 0) {
+void printTree(astNode *root) {
+  if (root == nullptr) {
     printf("(null)");
   } else {
     printf("%s:%d:%d: ", root->fileName, root->line, root->column);

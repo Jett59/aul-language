@@ -4,24 +4,11 @@
 #include "type.h"
 
 enum astNodeType {
-  symbolTable,
-  program,
-  moduleDeclaration,
-  packageDefinition,
-  definitions,
-  variableDefinition,
-  functionDefinition,
-  argumentList,
-  statements,
-  returnStatement,
-  numberExpression,
-  variableReferenceExpression,
-  castExpression,
-  assignExpression,
-  addExpression,
-  subtractExpression,
-  multiplyExpression,
-  divideExpression
+  symbolTable, program, moduleDeclaration, packageDefinition, definitions,
+  variableDefinition, functionDefinition, argumentList, statements,
+  returnStatement, numberExpression, variableReferenceExpression,
+  castExpression, assignExpression, addExpression, subtractExpression,
+  multiplyExpression, divideExpression
 };
 
 union astNodeValue {
@@ -29,27 +16,39 @@ union astNodeValue {
   double number;
 };
 
-enum astNodeFlags { flag_null = 0, flag_export = 1, flag_internal = 2, flag_instance = 4, flag_static = 8 };
+enum astNodeFlags {
+  flag_null = 0,
+  flag_export = 1,
+  flag_internal = 2,
+  flag_instance = 4,
+  flag_static = 8
+};
+
+static inline astNodeFlags operator|(astNodeFlags a, astNodeFlags b) {
+      return static_cast<astNodeFlags>(static_cast<int>(a) |
+                                       static_cast<int>(b));
+                                       }
 
 struct astNode {
   const char *fileName;
   int line;
   int column;
-  struct astNode *parent;
-  enum astNodeType nodeType;
-  union astNodeValue value;
-  struct typeNode *type;
-  enum astNodeFlags flags;
+  astNode *parent;
+  astNodeType nodeType;
+  astNodeValue value;
+  typeNode *type;
+  astNodeFlags flags;
   int numChildren;
-  struct astNode *children[0];
+  astNode *children[0];
 };
 
-struct astNode *createAstNode(const char* fileName, int line, int column, enum astNodeType nodeType, union astNodeValue value,
-                              struct typeNode* type, enum astNodeFlags flags, int numChildren, ...);
+astNode *createAstNode(const char *fileName, int line, int column,
+                              astNodeType nodeType,
+                              astNodeValue value, typeNode *type,
+                              astNodeFlags flags, int numChildren, ...);
 
-struct astNode *addAstNode(struct astNode **dest,
-                           struct astNode *element);
+astNode *addAstNode(astNode **dest, astNode *element);
 
-void printTree(struct astNode *root);
+void printTree(astNode *root);
 
 #endif

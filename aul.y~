@@ -19,7 +19,7 @@
 
 %locations
 
-%define parse.error verbose
+%error-verbose
 
 %{
 
@@ -61,7 +61,7 @@ aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
 %token BOOLEAN CHAR I8 I16 I32 I64 ISIZE U8 U16 U32 U64 USIZE F32 F64 PTR
 %token TRUE FALSE
 
-%token END  0
+%token END
 
 %nterm <char*> dottedIdentifier
 %nterm <typeNode*> type
