@@ -52,9 +52,9 @@ Mkfile.old
 dkms.conf
 
 #Bison and flex output
-lex.yy.c
-*.tab.c
-*.tab.h
+lex.yy.cc
+*.tab.cc
+*.hh
 
 #Visual Studio Code files
 /.vscode/
