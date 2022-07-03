@@ -6,7 +6,7 @@
 #include "location.hh"
 
 #if ! defined(yyFlexLexerOnce)
-#include <FlexLexer.h>
+#include "FlexLexer.h"
 #endif
 
 #undef YY_DECL

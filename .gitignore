@@ -61,3 +61,6 @@ lex.yy.cc
 
 #Build output
 /build/
+
+# Flex header file
+flexLexer.h
