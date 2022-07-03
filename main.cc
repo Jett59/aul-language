@@ -1,8 +1,5 @@
-#include "ast.h"
 #include "lexer.h"
 #include "aul.tab.hh"
-#include "semantics.h"
-#include "symbols.h"
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -28,23 +25,13 @@ int main(int argc, char **argv) {
     }
   }
   Lexer lexer(*input);
-  astNode *ast;
-  Parser parser(lexer, fileName, &ast);
+  Parser parser(lexer, fileName);
   int result;
   result = parser();
   if (argc > 1) {
     fileInput.close();
   }
-  if (result == 0) {
-    result = buildSymbolTable(&ast, 0);
-    if (result == 0) {
-      result = analyseSemantics(ast);
-      if (result == 0) {
-        printTree(ast);
-      }
-    }
-  }
-  if (result != 0) {
+    if (result != 0) {
     fprintf(stderr, "Compilation aborted.\n");
   }
   return result;

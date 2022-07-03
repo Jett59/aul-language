@@ -3,19 +3,26 @@
 
 %{
 
+#include <cstdint>
 #include "aul.tab.hh"
 #include "location.hh"
-#include "error.h"
 #include "lexer.h"
-
-extern fileName;
 
 #define YY_USER_ACTION updateLocation(yytext);
 
-#define yyterminate()  Parser::make_END(currentLocation);
-
 #define MAKE(TYPE)  Parser::make_ ## TYPE (currentLocation)
-#define MAKE_PARAMS(TYPE, ...) Parser::make_ ## TYPE (currentLocation, __VA_ARGS__)
+#define MAKE_PARAMS(TYPE, ...) Parser::make_ ## TYPE (__VA_ARGS__, currentLocation)
+
+#define yyterminate() MAKE(END)
+
+static uintmax_t toInt(const char *str) {
+    uintmax_t result = 0;
+    while (*str) {
+        result = result * 10 + (*str - '0');
+        str++;
+    }
+    return result;
+}
 
 %}
 
@@ -27,6 +34,23 @@ extern fileName;
 "//".*   ;
 
 "\n"|" "|"\t"   ;
+
+[a-zA-Z_][a-zA-Z0-9_]* return MAKE_PARAMS(IDENTIFIER, yytext);
+[0-9]+ return MAKE_PARAMS(INTEGER, toInt(yytext));
+
+"(" return MAKE(LEFT_PAREN);
+")" return MAKE(RIGHT_PAREN);
+"{" return MAKE(LEFT_BRACE);
+"}" return MAKE(RIGHT_BRACE);
+"[" return MAKE(LEFT_BRACKET);
+"]" return MAKE(RIGHT_BRACKET);
+
+"<" return MAKE(LESS);
+">" return MAKE(GREATER);
+"=" return MAKE(EQUALS);
+"==" return MAKE(EQUALS_EQUALS);
+"<=" return MAKE(LESS_EQUALS);
+">=" return MAKE(GREATER_EQUALS);
 
 .  return yyterminate();
 

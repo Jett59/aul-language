@@ -6,7 +6,7 @@ program-suffix:=
 ifeq ($(OS),Windows_NT)
   program-suffix:=.exe
   shared-library-suffix:=.dll
-# Use gcc instead of clang on windows because it has better posix support
+# Use gcc instead of clang on windows because it has better posix support + clang doesn't like -fPIC for some reason
   CC=gcc
   CXX=g++
   else ifeq ($(shell uname -s),Darwin)
@@ -16,8 +16,7 @@ ifeq ($(OS),Windows_NT)
   endif
 
 LIB-OBJS:=error.o
-LIB-OBJS+=aul.tab.o lex.yy.o ast.o type.o
-LIB-OBJS+=symbols.o semantics.o
+LIB-OBJS+=aul.tab.o lex.yy.o
 PROGRAM-OBJS+=main.o
 
 PROGRAM:=build/bin/aulc$(program-suffix)
@@ -25,7 +24,8 @@ PROGRAM:=build/bin/aulc$(program-suffix)
 LIBNAME:=aul
 LIB:=build/lib/libaul$(shared-library-suffix)
 
-CXXFLAGS:=-fPIC -std=gnu++17 -g
+# -I . to include flexLexer.h which may be in the current working directory.
+CXXFLAGS:=-fPIC -std=gnu++17 -g -I .
 LDFLAGS:=-Lbuild/lib
 
 ifneq ($(OS),Windows_NT)
