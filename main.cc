@@ -3,20 +3,23 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 using namespace aul;
 
+using std::ifstream;
 using std::istream;
+using std::unique_ptr;
 
 int main(int argc, char **argv) {
   istream *input;
-  std::ifstream fileInput;
+  ifstream fileInput;
   const char *fileName;
   if (argc < 2) {
     input = &std::cin;
     fileName = "<stdin>";
   } else {
-    fileInput = std::ifstream(argv[1]);
+    fileInput = ifstream(argv[1]);
     input = &fileInput;
     fileName = argv[1];
     if (!fileInput) {
@@ -24,8 +27,9 @@ int main(int argc, char **argv) {
       return 1;
     }
   }
+  unique_ptr<AstNode> ast;
   Lexer lexer(*input);
-  Parser parser(lexer, fileName);
+  Parser parser(lexer, fileName, &ast);
   int result;
   result = parser();
   if (argc > 1) {

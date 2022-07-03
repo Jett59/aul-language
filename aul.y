@@ -6,6 +6,7 @@
 %define api.parser.class  { Parser }
 
 %code requires {
+    #include "ast.h"
 
     namespace aul {
         class Lexer;
@@ -22,19 +23,24 @@
 
 #include <cstdint>
 #include <iostream>
+#include <memory>
 #include "error.h"
-
+#include "ast.h"
 #include "lexer.h"
 
 aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
     return lexer.next();
 }
 
+using std::make_unique;
+using std::move;
+
 %}
 
 %lex-param { aul::Lexer& lexer }
 %parse-param { aul::Lexer& lexer }
 %parse-param { std::string fileName }
+%parse-param {std::unique_ptr<aul::AstNode> *ast}
 
 %token <std::string> IDENTIFIER "identifier"
 %token <uintmax_t> INTEGER "integer"
@@ -55,11 +61,19 @@ aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
 
 %token END 0 "EOF"
 
-%start definitions
+%type <std::unique_ptr<aul::DefinitionsNode>> definitions
+
+%start compilation_unit
 
 %%
 
-definitions: IDENTIFIER;
+compilation_unit: definitions {
+    *ast = move($1);
+}
+
+definitions: IDENTIFIER {
+    $$ = make_unique<DefinitionsNode>();
+}
 
 %%
 
