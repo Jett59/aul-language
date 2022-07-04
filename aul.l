@@ -38,6 +38,17 @@ static uintmax_t toInt(const char *str) {
 "let" return MAKE(LET);
 "const" return MAKE(CONST);
 
+"as" return MAKE(AS);
+
+"byte" return MAKE(BYTE);
+"int16" return MAKE(INT16);
+"int32" return MAKE(INT32);
+"int64" return MAKE(INT64);
+"char" return MAKE(CHAR);
+"bool" return MAKE(BOOL);
+"fastint" return MAKE(FASTINT);
+"size" return MAKE(SIZE);
+
 [a-zA-Z_][a-zA-Z0-9_]* return MAKE_PARAMS(IDENTIFIER, yytext);
 [0-9]+ return MAKE_PARAMS(INTEGER, toInt(yytext));
 
@@ -50,6 +61,9 @@ static uintmax_t toInt(const char *str) {
 "[" return MAKE(LEFT_BRACKET);
 "]" return MAKE(RIGHT_BRACKET);
 "." return MAKE(DOT);
+"," return MAKE(COMMA);
+"|" return MAKE(PIPE);
+":" return MAKE(COLON);
 
 "<" return MAKE(LESS);
 ">" return MAKE(GREATER);

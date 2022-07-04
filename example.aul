@@ -1,2 +1,3 @@
 let thingy = 17;
-let thing = 23;
+const thing = 23;
+let castedThing = 123 as [fastint]|{value: size}|byte;

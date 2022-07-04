@@ -1,6 +1,7 @@
 #ifndef AUL_AST_H
 #define AUL_AST_H
 
+#include "type.h"
 #include <algorithm>
 #include <cstdint>
 #include <memory>
@@ -16,6 +17,9 @@ public:
   virtual std::unique_ptr<AstVisitor> visitDefinitions() { return nullptr; }
   virtual std::unique_ptr<AstVisitor> visitDefinition(bool constant,
                                                       const std::string &name) {
+    return nullptr;
+  }
+  virtual std::unique_ptr<AstVisitor> visitCast(const Type &type) {
     return nullptr;
   }
 
@@ -74,6 +78,20 @@ public:
 
 private:
   uintmax_t value;
+};
+class CastNode : public AstNode {
+public:
+  CastNode(std::unique_ptr<Type> type, std::unique_ptr<AstNode> value)
+      : type(std::move(type)), value(std::move(value)) {}
+
+  virtual void apply(AstVisitor &visitor) {
+    std::unique_ptr<AstVisitor> valueVisitor = visitor.visitCast(*type);
+    value->apply(*valueVisitor);
+  }
+
+private:
+  std::unique_ptr<Type> type;
+  std::unique_ptr<AstNode> value;
 };
 } // namespace aul
 

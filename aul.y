@@ -28,6 +28,7 @@
 #include "error.h"
 #include "ast.h"
 #include "lexer.h"
+#include "type.h"
 
 aul::Parser::symbol_type yylex(aul::Lexer& lexer) {
     return lexer.next();
@@ -49,6 +50,11 @@ using std::move;
 %token LET "let"
 %token CONST "const"
 
+%token AS "as"
+
+%token BYTE "byte" %token INT16 "int16" %token INT32 "int32" %token INT64 "int64"
+%token CHAR "char" %token BOOL "bool" %token FASTINT "fastint" %token SIZE "size"
+
 %token SEMICOLON ";"
 
 %token LEFT_PAREN "("
@@ -58,6 +64,9 @@ using std::move;
 %token LEFT_BRACKET "["
 %token RIGHT_BRACKET "]"
 %token DOT "."
+%token COMMA ","
+%token PIPE "|"
+%token COLON ":"
 
 %token LESS "<"
 %token GREATER ">"
@@ -69,7 +78,13 @@ using std::move;
 %token END 0 "EOF"
 
 %type <std::unique_ptr<aul::DefinitionsNode>> definitions
-%type <std::unique_ptr<aul::AstNode>> definition expression integer-expression
+%type <std::unique_ptr<aul::AstNode>> definition expression integer-expression cast-expression
+
+%type <std::unique_ptr<aul::Type>> type type-no-intersection array-type tuple-type
+%type <std::unique_ptr<aul::TypeIntersection>> type-intersection
+%type <aul::PrimitiveTypeType> primitive-type
+%type <std::vector<aul::NamedType>> tuple-type-elements
+%type <aul::NamedType> tuple-type-element
 
 %start compilation_unit
 
@@ -96,10 +111,69 @@ definition: "const" IDENTIFIER "=" expression ";" {
     $$ = make_unique<DefinitionNode>(false, $2, $4);
 }
 
-expression: integer-expression
+expression: integer-expression | cast-expression
+
+cast-expression: expression "as" type {
+    $$ = make_unique<CastNode>($3, $1);
+}
 
 integer-expression: INTEGER {
     $$ = make_unique<IntegerNode>($1);
+}
+
+type: type-no-intersection | type-intersection{$$=$1;}
+
+type-no-intersection:
+primitive-type {$$ = make_unique<PrimitiveType>($1);}
+| array-type
+| tuple-type
+
+primitive-type:
+  "byte" {$$ = PrimitiveTypeType::BYTE;}
+| "int16" {$$ = PrimitiveTypeType::INT16;}
+| "int32" {$$ = PrimitiveTypeType::INT32;}
+| "int64" {$$ = PrimitiveTypeType::INT64;}
+| "char" {$$ = PrimitiveTypeType::CHAR;}
+| "bool" {$$ = PrimitiveTypeType::BOOL;}
+| "fastint" {$$ = PrimitiveTypeType::FASTINT;}
+| "size" {$$ = PrimitiveTypeType::SIZE;}
+
+array-type: "[" type "]" {
+    $$ = make_unique<Array>($2);
+}
+
+tuple-type: "{" tuple-type-elements "}" {
+    $$ = make_unique<Tuple>($2);
+}
+
+tuple-type-elements: tuple-type-element {
+    // Unfortunately, we can't just use an initializer list here. Don't ask me why.
+    std::vector<NamedType> elements;
+    elements.push_back($1);
+    $$ = move(elements);
+}
+| tuple-type-elements "," tuple-type-element {
+    auto elements = $1;
+    elements.push_back($3);
+    $$ = move(elements);
+}
+
+tuple-type-element: IDENTIFIER ":" type {
+    $$ = {$1, $3};
+}
+
+type-intersection:
+ type-intersection "|" type-no-intersection {
+    auto typeIntersection = $1;
+    typeIntersection->add($3);
+    $$ = move(typeIntersection);
+}
+| type-no-intersection "|" type-no-intersection {
+    // Don't ask me why we can't use an initializer list here either.
+    std::vector<std::unique_ptr<Type>> types;
+    types.push_back($1);
+    types.push_back($3);
+    $$ = make_unique<TypeIntersection>(move(types));
 }
 
 %%

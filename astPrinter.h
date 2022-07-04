@@ -16,11 +16,16 @@ public:
   }
 
   virtual std::unique_ptr<AstVisitor> visitDefinition(bool constant,
-                                                      const std::string &name) {
+                                                      const std::string &name) override {
     out << "Definition: " << (constant ? "constant" : "mutable") << " " << name
         << " {" << std::endl;
     return std::make_unique<AstPrinter>(out);
   }
+
+virtual std::unique_ptr<AstVisitor> visitCast(const Type &type) override {
+  out << "Cast<" << type.toString() << "> {" << std::endl;
+  return std::make_unique<AstPrinter>(out);
+}
 
   virtual void visitInteger(uintmax_t value) {
     out << "Integer: " << value << std::endl;

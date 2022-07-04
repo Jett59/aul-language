@@ -46,7 +46,7 @@ $(LIB): $(LIB-OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $^ -o $@
 
 aul.tab.cc: aul.y
-	bison -d --language=c++ $^
+	bison -d --language=c++ -Wcounterexamples $^
 
 lex.yy.cc: aul.l
 	flex $^
