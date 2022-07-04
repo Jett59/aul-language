@@ -45,7 +45,7 @@ $(LIB): $(LIB-OBJS)
 	mkdir -p build/lib
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $^ -o $@
 
-%.tab.cc: %.y
+aul.tab.cc: aul.y
 	bison -d --language=c++ $^
 
 lex.yy.cc: aul.l

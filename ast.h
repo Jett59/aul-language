@@ -2,7 +2,9 @@
 #define AUL_AST_H
 
 #include <algorithm>
+#include <cstdint>
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -10,6 +12,14 @@ namespace aul {
 class AstVisitor {
 public:
   virtual ~AstVisitor() {}
+
+  virtual std::unique_ptr<AstVisitor> visitDefinitions() { return nullptr; }
+  virtual std::unique_ptr<AstVisitor> visitDefinition(bool constant,
+                                                      const std::string &name) {
+    return nullptr;
+  }
+
+  virtual void visitInteger(uintmax_t value) {}
 };
 
 class AstNode {
@@ -25,13 +35,41 @@ public:
   }
 
   virtual void apply(AstVisitor &visitor) {
-    std::for_each(
-        definitions.begin(), definitions.end(),
-        [&visitor](std::unique_ptr<AstNode> &node) { node->apply(visitor); });
+    std::unique_ptr<AstVisitor> definitionsVisitor = visitor.visitDefinitions();
+    std::for_each(definitions.begin(), definitions.end(),
+                  [&](std::unique_ptr<AstNode> &node) {
+                    node->apply(*definitionsVisitor);
+                  });
   }
 
 private:
   std::vector<std::unique_ptr<AstNode>> definitions;
+};
+class DefinitionNode : public AstNode {
+public:
+  DefinitionNode(bool constant, std::string name,
+                 std::unique_ptr<AstNode> value)
+      : constant(constant), name(std::move(name)), value(std::move(value)) {}
+
+  virtual void apply(AstVisitor &visitor) {
+    std::unique_ptr<AstVisitor> valueVisitor =
+        visitor.visitDefinition(constant, name);
+    value->apply(*valueVisitor);
+  }
+
+private:
+  bool constant;
+  std::string name;
+  std::unique_ptr<AstNode> value;
+};
+class IntegerNode : public AstNode {
+public:
+  IntegerNode(uintmax_t value) : value(value) {}
+
+  virtual void apply(AstVisitor &visitor) { visitor.visitInteger(value); }
+
+private:
+  uintmax_t value;
 };
 } // namespace aul
 

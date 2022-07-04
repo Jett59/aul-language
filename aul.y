@@ -45,12 +45,18 @@ using std::move;
 %token <std::string> IDENTIFIER "identifier"
 %token <uintmax_t> INTEGER "integer"
 
+%token LET "let"
+%token CONST "const"
+
+%token SEMICOLON ";"
+
 %token LEFT_PAREN "("
 %token RIGHT_PAREN ")"
 %token LEFT_BRACE "{"
 %token RIGHT_BRACE "}"
 %token LEFT_BRACKET "["
 %token RIGHT_BRACKET "]"
+%token DOT "."
 
 %token LESS "<"
 %token GREATER ">"
@@ -62,6 +68,7 @@ using std::move;
 %token END 0 "EOF"
 
 %type <std::unique_ptr<aul::DefinitionsNode>> definitions
+%type <std::unique_ptr<aul::AstNode>> definition expression integer-expression
 
 %start compilation_unit
 
@@ -71,8 +78,26 @@ compilation_unit: definitions {
     *ast = move($1);
 }
 
-definitions: IDENTIFIER {
+definitions: 
+%empty {
     $$ = make_unique<DefinitionsNode>();
+}
+| definitions definition {
+    $1->add(move($2));
+    $$ = move($1);
+}
+
+definition: "const" IDENTIFIER "=" expression ";" {
+    $$ = make_unique<DefinitionNode>(true, move($2), move($4));
+}
+| "let" IDENTIFIER "=" expression ";" {
+    $$ = make_unique<DefinitionNode>(false, move($2), move($4));
+}
+
+expression: integer-expression {$$ = move($1);}
+
+integer-expression: INTEGER {
+    $$ = make_unique<IntegerNode>($1);
 }
 
 %%
