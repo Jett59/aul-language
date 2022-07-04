@@ -1,5 +1,6 @@
 %define api.token.constructor
 %define api.value.type variant
+%define api.value.automove
 
 %define api.namespace { aul }
 
@@ -83,18 +84,19 @@ definitions:
     $$ = make_unique<DefinitionsNode>();
 }
 | definitions definition {
-    $1->add(move($2));
-    $$ = move($1);
+    auto definitions = $1;
+    definitions->add($2);
+    $$ = move(definitions);
 }
 
 definition: "const" IDENTIFIER "=" expression ";" {
-    $$ = make_unique<DefinitionNode>(true, move($2), move($4));
+    $$ = make_unique<DefinitionNode>(true, $2, $4);
 }
 | "let" IDENTIFIER "=" expression ";" {
-    $$ = make_unique<DefinitionNode>(false, move($2), move($4));
+    $$ = make_unique<DefinitionNode>(false, $2, $4);
 }
 
-expression: integer-expression {$$ = move($1);}
+expression: integer-expression
 
 integer-expression: INTEGER {
     $$ = make_unique<IntegerNode>($1);
