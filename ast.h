@@ -20,6 +20,8 @@ public:
   }
 
   virtual void visitInteger(uintmax_t value) {}
+
+  virtual void visitEnd() {}
 };
 
 class AstNode {
@@ -40,6 +42,7 @@ public:
                   [&](std::unique_ptr<AstNode> &node) {
                     node->apply(*definitionsVisitor);
                   });
+    definitionsVisitor->visitEnd();
   }
 
 private:
@@ -55,6 +58,7 @@ public:
     std::unique_ptr<AstVisitor> valueVisitor =
         visitor.visitDefinition(constant, name);
     value->apply(*valueVisitor);
+    valueVisitor->visitEnd();
   }
 
 private:

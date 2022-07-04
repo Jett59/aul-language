@@ -1,3 +1,3 @@
-example.aul:1:12:
-syntax error, unexpected EQUALS, expecting '='
-Compilation aborted.
+let: Unknown token
+Definitions {
+}

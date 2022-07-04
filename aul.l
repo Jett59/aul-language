@@ -33,13 +33,15 @@ static uintmax_t toInt(const char *str) {
 
 "//".* ;
 
-"\n"|" "|"\t" ;
+"\n"|"\r"|" "|"\t" ;
 
 "let" return MAKE(LET);
 "const" return MAKE(CONST);
 
 [a-zA-Z_][a-zA-Z0-9_]* return MAKE_PARAMS(IDENTIFIER, yytext);
 [0-9]+ return MAKE_PARAMS(INTEGER, toInt(yytext));
+
+";" return MAKE(SEMICOLON);
 
 "(" return MAKE(LEFT_PAREN);
 ")" return MAKE(RIGHT_PAREN);
@@ -56,7 +58,12 @@ static uintmax_t toInt(const char *str) {
 "<=" return MAKE(LESS_EQUALS);
 ">=" return MAKE(GREATER_EQUALS);
 
-.  return yyterminate();
+<<EOF>> return yyterminate();
+
+. {
+    std::cerr << "Unknown character: " << yytext << std::endl;
+    return yyterminate();
+}
 
 %%
 

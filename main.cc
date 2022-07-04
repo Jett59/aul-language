@@ -1,5 +1,6 @@
-#include "lexer.h"
 #include "aul.tab.hh"
+#include "astPrinter.h"
+#include "lexer.h"
 #include <cstdio>
 #include <fstream>
 #include <iostream>
@@ -30,12 +31,15 @@ int main(int argc, char **argv) {
   unique_ptr<AstNode> ast;
   Lexer lexer(*input);
   Parser parser(lexer, fileName, &ast);
-  int result;
-  result = parser();
+  int result = parser();
   if (argc > 1) {
     fileInput.close();
   }
-    if (result != 0) {
+  if (result == 0) {
+    AstPrinter astPrinter(std::cout);
+    ast->apply(astPrinter);
+  }
+  if (result != 0) {
     fprintf(stderr, "Compilation aborted.\n");
   }
   return result;
