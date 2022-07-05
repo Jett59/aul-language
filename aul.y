@@ -80,11 +80,12 @@ using std::move;
 %type <std::unique_ptr<aul::DefinitionsNode>> definitions
 %type <std::unique_ptr<aul::AstNode>> definition expression integer-expression cast-expression
 
-%type <std::unique_ptr<aul::Type>> type type-no-intersection array-type tuple-type
+%type <std::unique_ptr<aul::Type>> type type-no-intersection array-type tuple-type function-type
 %type <std::unique_ptr<aul::TypeIntersection>> type-intersection
 %type <aul::PrimitiveTypeType> primitive-type
 %type <std::vector<aul::NamedType>> tuple-type-elements
 %type <aul::NamedType> tuple-type-element
+%type <std::vector<std::unique_ptr<Type>>> type-list
 
 %start compilation_unit
 
@@ -127,6 +128,7 @@ type-no-intersection:
 primitive-type {$$ = make_unique<PrimitiveType>($1);}
 | array-type
 | tuple-type
+| function-type
 
 primitive-type:
   "byte" {$$ = PrimitiveTypeType::BYTE;}
@@ -139,11 +141,11 @@ primitive-type:
 | "size" {$$ = PrimitiveTypeType::SIZE;}
 
 array-type: "[" type "]" {
-    $$ = make_unique<Array>($2);
+    $$ = make_unique<ArrayType>($2);
 }
 
 tuple-type: "{" tuple-type-elements "}" {
-    $$ = make_unique<Tuple>($2);
+    $$ = make_unique<TupleType>($2);
 }
 
 tuple-type-elements: tuple-type-element {
@@ -174,6 +176,26 @@ type-intersection:
     types.push_back($1);
     types.push_back($3);
     $$ = make_unique<TypeIntersection>(move(types));
+}
+
+function-type: "(" type-list ":" type ")" {
+    $$ = make_unique<FunctionType>($4, $2);
+}
+
+type-list:
+type{
+    // For some strange reason we can't use initializer lists.
+    std::vector<std::unique_ptr<Type>> types;
+    types.push_back($1);
+    $$ = move(types);
+}
+| %empty {
+    $$ = std::vector<std::unique_ptr<Type>>();
+}
+| type-list "," type {
+    auto types = $1;
+    types.push_back($3);
+    $$ = move(types);
 }
 
 %%

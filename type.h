@@ -7,14 +7,14 @@
 #include <vector>
 
 namespace aul {
-enum class TypeCategory { PRIMITIVE, ARRAY, TUPLE, INTERSECTION };
+enum class TypeCategory { PRIMITIVE, ARRAY, TUPLE, INTERSECTION, FUNCTION };
 class Type {
 public:
   virtual ~Type() {}
 
-  virtual TypeCategory getTypeCategory()const = 0;
+  virtual TypeCategory getTypeCategory() const = 0;
 
-  virtual std::string toString()const  = 0;
+  virtual std::string toString() const = 0;
 };
 enum class PrimitiveTypeType {
   BYTE,
@@ -30,7 +30,9 @@ class PrimitiveType : public Type {
 public:
   PrimitiveType(PrimitiveTypeType type) : type(type) {}
 
-  virtual TypeCategory getTypeCategory() const { return TypeCategory::PRIMITIVE; }
+  virtual TypeCategory getTypeCategory() const {
+    return TypeCategory::PRIMITIVE;
+  }
 
   PrimitiveTypeType getType() { return type; }
 
@@ -60,17 +62,17 @@ public:
 private:
   PrimitiveTypeType type;
 };
-class Array : public Type {
+class ArrayType : public Type {
 public:
-  Array(std::unique_ptr<Type> type) : type(std::move(type)) {}
+  ArrayType(std::unique_ptr<Type> type) : type(std::move(type)) {}
 
   virtual TypeCategory getTypeCategory() const { return TypeCategory::ARRAY; }
 
   const Type &getType() { return *type; }
 
-virtual std::string toString() const {
-  return "array<" + type->toString() + ">";
-}
+  virtual std::string toString() const {
+    return "array<" + type->toString() + ">";
+  }
 
 private:
   std::unique_ptr<Type> type;
@@ -79,9 +81,9 @@ struct NamedType {
   std::string name;
   std::unique_ptr<Type> type;
 };
-class Tuple : public Type {
+class TupleType : public Type {
 public:
-  Tuple(std::vector<NamedType> types) : types(std::move(types)) {}
+  TupleType(std::vector<NamedType> types) : types(std::move(types)) {}
 
   void add(NamedType type) { types.push_back(std::move(type)); }
 
@@ -89,15 +91,15 @@ public:
 
   const std::vector<NamedType> &getTypes() { return types; }
 
-virtual std::string toString() const {
-  std::string result = "tuple<";
-  for (auto &type : types) {
-    result += type.name + ":" + type.type->toString() + ",";
+  virtual std::string toString() const {
+    std::string result = "tuple<";
+    for (auto &type : types) {
+      result += type.name + ":" + type.type->toString() + ",";
+    }
+    result.pop_back();
+    result += ">";
+    return result;
   }
-  result.pop_back();
-  result += ">";
-  return result;
-}
 
 private:
   std::vector<NamedType> types;
@@ -109,22 +111,56 @@ public:
 
   void add(std::unique_ptr<Type> type) { types.push_back(std::move(type)); }
 
-  virtual TypeCategory getTypeCategory() const { return TypeCategory::INTERSECTION; }
+  virtual TypeCategory getTypeCategory() const {
+    return TypeCategory::INTERSECTION;
+  }
 
   const std::vector<std::unique_ptr<Type>> &getTypes() { return types; }
 
-virtual std::string toString() const {
-  std::string result = "intersection<";
-  for (auto &type : types) {
-    result += type->toString() + "|";
+  virtual std::string toString() const {
+    std::string result = "intersection<";
+    for (auto &type : types) {
+      result += type->toString() + "|";
+    }
+    result.pop_back();
+    result += ">";
+    return result;
   }
-  result.pop_back();
-  result += ">";
-  return result;
-}
 
 private:
   std::vector<std::unique_ptr<Type>> types;
+};
+class FunctionType : public Type {
+public:
+  FunctionType(std::unique_ptr<Type> returnType,
+               std::vector<std::unique_ptr<Type>> parameterTypes)
+      : returnType(std::move(returnType)),
+        parameterTypes(std::move(parameterTypes)) {}
+
+  virtual TypeCategory getTypeCategory() const {
+    return TypeCategory::FUNCTION;
+  }
+
+  const Type &getReturnType() { return *returnType; }
+
+  const std::vector<std::unique_ptr<Type>> &getParameterTypes() {
+    return parameterTypes;
+  }
+
+  virtual std::string toString() const {
+    std::string result = "function<";
+    result += returnType->toString() + ",";
+    for (auto &type : parameterTypes) {
+      result += type->toString() + ",";
+    }
+    result.pop_back();
+    result += ">";
+    return result;
+  }
+
+private:
+  std::unique_ptr<Type> returnType;
+  std::vector<std::unique_ptr<Type>> parameterTypes;
 };
 } // namespace aul
 
