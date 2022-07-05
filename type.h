@@ -154,7 +154,9 @@ public:
     for (auto &type : parameterTypes) {
       result += type->toString() + ",";
     }
-    result.pop_back();
+    if (parameterTypes.size() != 0) {
+      result.pop_back();
+    }
     result += ":" + returnType->toString();
     result += ">";
     return result;

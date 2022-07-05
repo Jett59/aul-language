@@ -22,6 +22,10 @@ public:
   virtual std::unique_ptr<AstVisitor> visitCast(const Type &type) {
     return nullptr;
   }
+  virtual std::unique_ptr<AstVisitor>
+  visitFunction(const std::vector<NamedType> &parameterTypes) {
+    return nullptr;
+  }
 
   virtual void visitInteger(uintmax_t value) {}
 
@@ -42,11 +46,13 @@ public:
 
   virtual void apply(AstVisitor &visitor) {
     std::unique_ptr<AstVisitor> definitionsVisitor = visitor.visitDefinitions();
-    std::for_each(definitions.begin(), definitions.end(),
-                  [&](std::unique_ptr<AstNode> &node) {
-                    node->apply(*definitionsVisitor);
-                  });
-    definitionsVisitor->visitEnd();
+    if (definitionsVisitor) {
+      std::for_each(definitions.begin(), definitions.end(),
+                    [&](std::unique_ptr<AstNode> &node) {
+                      node->apply(*definitionsVisitor);
+                    });
+      definitionsVisitor->visitEnd();
+    }
   }
 
 private:
@@ -61,8 +67,10 @@ public:
   virtual void apply(AstVisitor &visitor) {
     std::unique_ptr<AstVisitor> valueVisitor =
         visitor.visitDefinition(constant, name);
-    value->apply(*valueVisitor);
-    valueVisitor->visitEnd();
+    if (valueVisitor) {
+      value->apply(*valueVisitor);
+      valueVisitor->visitEnd();
+    }
   }
 
 private:
@@ -86,7 +94,10 @@ public:
 
   virtual void apply(AstVisitor &visitor) {
     std::unique_ptr<AstVisitor> valueVisitor = visitor.visitCast(*type);
-    value->apply(*valueVisitor);
+    if (valueVisitor) {
+      value->apply(*valueVisitor);
+      valueVisitor->visitEnd();
+    }
   }
 
 private:
