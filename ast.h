@@ -26,6 +26,7 @@ public:
   visitFunction(const std::vector<NamedType> &parameterTypes) {
     return nullptr;
   }
+  virtual std::unique_ptr<AstVisitor> visitBlock() { return nullptr; }
 
   virtual void visitInteger(uintmax_t value) {}
 
@@ -103,6 +104,45 @@ public:
 private:
   std::unique_ptr<Type> type;
   std::unique_ptr<AstNode> value;
+};
+class FunctionNode : public AstNode {
+public:
+  FunctionNode(std::vector<NamedType> parameterTypes,
+               std::vector<std::unique_ptr<AstNode>> body)
+      : parameterTypes(std::move(parameterTypes)), body(std::move(body)) {}
+
+  virtual void apply(AstVisitor &visitor) {
+    std::unique_ptr<AstVisitor> bodyVisitor =
+        visitor.visitFunction(parameterTypes);
+    if (bodyVisitor) {
+      std::for_each(
+          body.begin(), body.end(),
+          [&](std::unique_ptr<AstNode> &node) { node->apply(*bodyVisitor); });
+      bodyVisitor->visitEnd();
+    }
+  }
+
+private:
+  std::vector<NamedType> parameterTypes;
+  std::vector<std::unique_ptr<AstNode>> body;
+};
+class BlockStatementNode : public AstNode {
+public:
+  BlockStatementNode(std::vector<std::unique_ptr<AstNode>> statements)
+      : statements(std::move(statements)) {}
+
+  virtual void apply(AstVisitor &visitor) {
+    std::unique_ptr<AstVisitor> statementsVisitor = visitor.visitBlock();
+    if (statementsVisitor) {
+      std::for_each(statements.begin(), statements.end(),
+                    [&](std::unique_ptr<AstNode> &node) {
+                      node->apply(*statementsVisitor);
+                    });
+    }
+  }
+
+private:
+  std::vector<std::unique_ptr<AstNode>> statements;
 };
 } // namespace aul
 

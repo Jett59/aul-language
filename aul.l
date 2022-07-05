@@ -72,6 +72,8 @@ static uintmax_t toInt(const char *str) {
 "<=" return MAKE(LESS_EQUALS);
 ">=" return MAKE(GREATER_EQUALS);
 
+"->" return MAKE(ARROW);
+
 <<EOF>> return yyterminate();
 
 . {

@@ -75,10 +75,12 @@ using std::move;
 %token LESS_EQUALS "<="
 %token GREATER_EQUALS ">="
 
+%token ARROW "->"
+
 %token END 0 "EOF"
 
 %type <std::unique_ptr<aul::DefinitionsNode>> definitions
-%type <std::unique_ptr<aul::AstNode>> definition expression integer-expression cast-expression
+%type <std::unique_ptr<aul::AstNode>> definition expression integer-expression cast-expression function-expression statement block-statement
 
 %type <std::unique_ptr<aul::Type>> type type-no-intersection array-type tuple-type function-type
 %type <std::unique_ptr<aul::TypeIntersection>> type-intersection
@@ -86,6 +88,8 @@ using std::move;
 %type <std::vector<aul::NamedType>> tuple-type-elements
 %type <aul::NamedType> tuple-type-element
 %type <std::vector<std::unique_ptr<Type>>> type-list
+
+%type <std::vector<std::unique_ptr<AstNode>>> statement-list
 
 %start compilation_unit
 
@@ -112,7 +116,7 @@ definition: "const" IDENTIFIER "=" expression ";" {
     $$ = make_unique<DefinitionNode>(false, $2, $4);
 }
 
-expression: integer-expression | cast-expression
+expression: integer-expression | cast-expression | function-expression
 
 cast-expression: expression "as" type {
     $$ = make_unique<CastNode>($3, $1);
@@ -120,6 +124,10 @@ cast-expression: expression "as" type {
 
 integer-expression: INTEGER {
     $$ = make_unique<IntegerNode>($1);
+}
+
+function-expression: "(" tuple-type-elements ")" "->" "{" statement-list "}" {
+    $$ = make_unique<FunctionNode>($2, $6);
 }
 
 type: type-no-intersection | type-intersection{$$=$1;}
@@ -200,6 +208,22 @@ type{
     auto types = $1;
     types.push_back($3);
     $$ = move(types);
+}
+
+statement: block-statement
+
+block-statement: "{" statement-list "}" {
+    $$ = make_unique<BlockStatementNode>($2);
+}
+
+statement-list:
+%empty {
+    $$ = std::vector<std::unique_ptr<AstNode>>();
+}   
+| statement-list statement {
+    auto statements = $1;
+    statements.push_back($2);
+    $$ = move(statements);
 }
 
 %%
