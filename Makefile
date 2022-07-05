@@ -17,6 +17,7 @@ ifeq ($(OS),Windows_NT)
 
 LIB-OBJS:=error.o
 LIB-OBJS+=aul.tab.o lex.yy.o
+LIB-OBJS+=astPrinter.o
 PROGRAM-OBJS+=main.o
 
 PROGRAM:=build/bin/aulc$(program-suffix)
@@ -25,7 +26,7 @@ LIBNAME:=aul
 LIB:=build/lib/libaul$(shared-library-suffix)
 
 # -I . to include flexLexer.h which may be in the current working directory.
-CXXFLAGS:=-fPIC -std=gnu++17 -g -I .
+CXXFLAGS:=-fPIC -std=gnu++17 -g -Og -I .
 LDFLAGS:=-Lbuild/lib
 
 ifneq ($(OS),Windows_NT)
