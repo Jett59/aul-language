@@ -1,4 +1,4 @@
 let thingy = 17;
 const thing = 23;
 let castedThing = 123 as [fastint]|{value: fastint, count: size}|byte;
-const castedThingy = 123 as (fastint, int32: size | (int32|{age: int32}, size: int16));
+const castedThingy = 123 as (fastint, int32: size | (int32|{age: int32}, size: int16|{}));

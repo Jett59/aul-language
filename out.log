@@ -1,0 +1,16 @@
+Definitions {
+Definition: mutable thingy {
+Integer: 17
+}
+Definition: constant thing {
+Integer: 23
+}
+Definition: mutable castedThing {
+Cast<intersection<array<fastint>|tuple<value:fastint,count:size>|byte>> {
+Integer: 123
+}
+Definition: constant castedThingy {
+Cast<function<fastint,int32:intersection<size|function<intersection<int32|tuple<age:int32>>,size:intersection<int16|tuple<>>>>>> {
+Integer: 123
+}
+}

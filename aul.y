@@ -148,7 +148,11 @@ tuple-type: "{" tuple-type-elements "}" {
     $$ = make_unique<TupleType>($2);
 }
 
-tuple-type-elements: tuple-type-element {
+tuple-type-elements: 
+%empty {
+    $$ = std::vector<NamedType>();
+}
+| tuple-type-element {
     // Unfortunately, we can't just use an initializer list here. Don't ask me why.
     std::vector<NamedType> elements;
     elements.push_back($1);

@@ -96,7 +96,9 @@ public:
     for (auto &type : types) {
       result += type.name + ":" + type.type->toString() + ",";
     }
-    result.pop_back();
+    if (types.size() != 0) {
+      result.pop_back();
+    }
     result += ">";
     return result;
   }
@@ -149,11 +151,11 @@ public:
 
   virtual std::string toString() const {
     std::string result = "function<";
-    result += returnType->toString() + ",";
     for (auto &type : parameterTypes) {
       result += type->toString() + ",";
     }
     result.pop_back();
+    result += ":" + returnType->toString();
     result += ">";
     return result;
   }
