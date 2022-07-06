@@ -111,8 +111,6 @@ public:
   TypeIntersection(std::vector<std::unique_ptr<Type>> types)
       : types(std::move(types)) {}
 
-  void add(std::unique_ptr<Type> type) { types.push_back(std::move(type)); }
-
   virtual TypeCategory getTypeCategory() const {
     return TypeCategory::INTERSECTION;
   }

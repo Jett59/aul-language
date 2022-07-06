@@ -10,6 +10,25 @@
 #include <vector>
 
 namespace aul {
+enum class BinaryOperatorType {
+  ADD,
+  SUBTRACT,
+  MULTIPLY,
+  DIVIDE,
+  MODULO,
+  BITWISE_XOR,
+  BITWISE_AND,
+  BITWISE_OR,
+  BITWISE_LEFT_SHIFT,
+  BITWISE_RIGHT_SHIFT,
+  ASSIGN,
+  EQUAL,
+  NOT_EQUAL,
+  LESS,
+  GREATER,
+  LESS_EQUAL,
+  GREATER_EQUAL
+};
 class AstVisitor {
 public:
   virtual ~AstVisitor() {}
@@ -27,6 +46,10 @@ public:
     return nullptr;
   }
   virtual std::unique_ptr<AstVisitor> visitBlock() { return nullptr; }
+  virtual std::unique_ptr<AstVisitor>
+  visitBinaryExpression(BinaryOperatorType operatorType) {
+    return nullptr;
+  }
 
   virtual void visitInteger(uintmax_t value) {}
 
@@ -79,7 +102,7 @@ public:
 
   virtual void apply(AstVisitor &visitor) override;
 
- private:
+private:
   std::unique_ptr<Type> type;
   std::unique_ptr<AstNode> value;
 };
@@ -104,6 +127,21 @@ public:
 
 private:
   std::vector<std::unique_ptr<AstNode>> statements;
+};
+class BinaryExpressionNode : public AstNode {
+public:
+  BinaryExpressionNode(BinaryOperatorType operatorType,
+                       std::unique_ptr<AstNode> left,
+                       std::unique_ptr<AstNode> right)
+      : operatorType(operatorType), left(std::move(left)),
+        right(std::move(right)) {}
+
+  virtual void apply(AstVisitor &visitor) override;
+
+private:
+  BinaryOperatorType operatorType;
+  std::unique_ptr<AstNode> left;
+  std::unique_ptr<AstNode> right;
 };
 } // namespace aul
 

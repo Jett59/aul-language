@@ -47,4 +47,13 @@ void BlockStatementNode::apply(AstVisitor &visitor) {
     statementsVisitor->visitEnd();
   }
 }
+void BinaryExpressionNode::apply(AstVisitor &visitor) {
+  std::unique_ptr<AstVisitor> operandVisitor =
+      visitor.visitBinaryExpression(operatorType);
+  if (operandVisitor) {
+    left->apply(*operandVisitor);
+    right->apply(*operandVisitor);
+    operandVisitor->visitEnd();
+  }
+}
 } // namespace aul

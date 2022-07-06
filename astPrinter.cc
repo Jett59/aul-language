@@ -1,5 +1,6 @@
 #include "astPrinter.h"
 #include <iostream>
+#include <map>
 
 namespace aul {
 std::unique_ptr<AstVisitor> AstPrinter::visitDefinitions() {
@@ -32,6 +33,32 @@ AstPrinter::visitFunction(const std::vector<NamedType> &parameterTypes) {
 }
 std::unique_ptr<AstVisitor> AstPrinter::visitBlock() {
   out << "Block {" << std::endl;
+  return std::make_unique<AstPrinter>(out);
+}
+
+static const std::map<BinaryOperatorType, std::string>
+    binaryOperatorTypeToString = {
+        {BinaryOperatorType::ADD, "+"},
+        {BinaryOperatorType::SUBTRACT, "-"},
+        {BinaryOperatorType::MULTIPLY, "*"},
+        {BinaryOperatorType::DIVIDE, "/"},
+        {BinaryOperatorType::MODULO, "%"},
+        {BinaryOperatorType::BITWISE_XOR, "^"},
+        {BinaryOperatorType::BITWISE_AND, "&"},
+        {BinaryOperatorType::BITWISE_OR, "|"},
+        {BinaryOperatorType::BITWISE_LEFT_SHIFT, "<<"},
+        {BinaryOperatorType::BITWISE_RIGHT_SHIFT, ">>"},
+        {BinaryOperatorType::ASSIGN, "="},
+        {BinaryOperatorType::LESS, "<"},
+        {BinaryOperatorType::LESS_EQUAL, "<="},
+        {BinaryOperatorType::GREATER, ">"},
+        {BinaryOperatorType::GREATER_EQUAL, ">="},
+        {BinaryOperatorType::EQUAL, "=="},
+        {BinaryOperatorType::NOT_EQUAL, "!="}};
+
+std::unique_ptr<AstVisitor>
+AstPrinter::visitBinaryExpression(BinaryOperatorType operatorType) {
+  out << binaryOperatorTypeToString.at(operatorType) << " {" << std::endl;
   return std::make_unique<AstPrinter>(out);
 }
 
