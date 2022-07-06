@@ -210,7 +210,7 @@ type{
     $$ = move(types);
 }
 
-statement: block-statement
+statement: block-statement | expression ";" | definition
 
 block-statement: "{" statement-list "}" {
     $$ = make_unique<BlockStatementNode>($2);
