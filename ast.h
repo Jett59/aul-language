@@ -45,16 +45,7 @@ public:
     definitions.push_back(std::move(node));
   }
 
-  virtual void apply(AstVisitor &visitor) {
-    std::unique_ptr<AstVisitor> definitionsVisitor = visitor.visitDefinitions();
-    if (definitionsVisitor) {
-      std::for_each(definitions.begin(), definitions.end(),
-                    [&](std::unique_ptr<AstNode> &node) {
-                      node->apply(*definitionsVisitor);
-                    });
-      definitionsVisitor->visitEnd();
-    }
-  }
+  virtual void apply(AstVisitor &visitor) override;
 
 private:
   std::vector<std::unique_ptr<AstNode>> definitions;
@@ -65,14 +56,7 @@ public:
                  std::unique_ptr<AstNode> value)
       : constant(constant), name(std::move(name)), value(std::move(value)) {}
 
-  virtual void apply(AstVisitor &visitor) {
-    std::unique_ptr<AstVisitor> valueVisitor =
-        visitor.visitDefinition(constant, name);
-    if (valueVisitor) {
-      value->apply(*valueVisitor);
-      valueVisitor->visitEnd();
-    }
-  }
+  virtual void apply(AstVisitor &visitor) override;
 
 private:
   bool constant;
@@ -83,7 +67,7 @@ class IntegerNode : public AstNode {
 public:
   IntegerNode(uintmax_t value) : value(value) {}
 
-  virtual void apply(AstVisitor &visitor) { visitor.visitInteger(value); }
+  virtual void apply(AstVisitor &visitor) override;
 
 private:
   uintmax_t value;
@@ -93,15 +77,9 @@ public:
   CastNode(std::unique_ptr<Type> type, std::unique_ptr<AstNode> value)
       : type(std::move(type)), value(std::move(value)) {}
 
-  virtual void apply(AstVisitor &visitor) {
-    std::unique_ptr<AstVisitor> valueVisitor = visitor.visitCast(*type);
-    if (valueVisitor) {
-      value->apply(*valueVisitor);
-      valueVisitor->visitEnd();
-    }
-  }
+  virtual void apply(AstVisitor &visitor) override;
 
-private:
+ private:
   std::unique_ptr<Type> type;
   std::unique_ptr<AstNode> value;
 };
@@ -111,16 +89,7 @@ public:
                std::vector<std::unique_ptr<AstNode>> body)
       : parameterTypes(std::move(parameterTypes)), body(std::move(body)) {}
 
-  virtual void apply(AstVisitor &visitor) {
-    std::unique_ptr<AstVisitor> bodyVisitor =
-        visitor.visitFunction(parameterTypes);
-    if (bodyVisitor) {
-      std::for_each(
-          body.begin(), body.end(),
-          [&](std::unique_ptr<AstNode> &node) { node->apply(*bodyVisitor); });
-      bodyVisitor->visitEnd();
-    }
-  }
+  virtual void apply(AstVisitor &visitor) override;
 
 private:
   std::vector<NamedType> parameterTypes;
@@ -131,15 +100,7 @@ public:
   BlockStatementNode(std::vector<std::unique_ptr<AstNode>> statements)
       : statements(std::move(statements)) {}
 
-  virtual void apply(AstVisitor &visitor) {
-    std::unique_ptr<AstVisitor> statementsVisitor = visitor.visitBlock();
-    if (statementsVisitor) {
-      std::for_each(statements.begin(), statements.end(),
-                    [&](std::unique_ptr<AstNode> &node) {
-                      node->apply(*statementsVisitor);
-                    });
-    }
-  }
+  virtual void apply(AstVisitor &visitor) override;
 
 private:
   std::vector<std::unique_ptr<AstNode>> statements;

@@ -1,4 +1,5 @@
 let thingy = 17 as int32|size;
 const func = (a: fastint, b: fastint)-> {
   // TODO
+{{{}}{}{}}
 };

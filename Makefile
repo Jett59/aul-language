@@ -17,7 +17,7 @@ ifeq ($(OS),Windows_NT)
 
 LIB-OBJS:=error.o
 LIB-OBJS+=aul.tab.o lex.yy.o
-LIB-OBJS+=astPrinter.o
+LIB-OBJS+=ast.o astPrinter.o
 PROGRAM-OBJS+=main.o
 
 PROGRAM:=build/bin/aulc$(program-suffix)

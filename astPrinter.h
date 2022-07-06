@@ -19,6 +19,7 @@ public:
 
   virtual std::unique_ptr<AstVisitor>
   visitFunction(const std::vector<NamedType> &parameterTypes) override;
+  virtual std::unique_ptr<AstVisitor> visitBlock() override;
 
   virtual void visitInteger(uintmax_t value) override;
 

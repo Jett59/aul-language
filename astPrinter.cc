@@ -30,6 +30,10 @@ AstPrinter::visitFunction(const std::vector<NamedType> &parameterTypes) {
   out << "{" << std::endl;
   return std::make_unique<AstPrinter>(out);
 }
+std::unique_ptr<AstVisitor> AstPrinter::visitBlock() {
+  out << "Block {" << std::endl;
+  return std::make_unique<AstPrinter>(out);
+}
 
 void AstPrinter::visitInteger(uintmax_t value) {
   out << "Integer: " << value << std::endl;
