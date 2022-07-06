@@ -1,3 +1,4 @@
+%require "3.8"
 %define api.token.constructor
 %define api.value.type variant
 %define api.value.automove
