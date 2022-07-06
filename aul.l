@@ -72,6 +72,8 @@ static uintmax_t toInt(const char *str) {
 "%" return MAKE(PERCENT);
 "^" return MAKE(CARET);
 "&" return MAKE(AMPERSAND);
+"<<" return MAKE(LEFT_SHIFT);
+">>" return MAKE(RIGHT_SHIFT);
 
 "<" return MAKE(LESS);
 ">" return MAKE(GREATER);

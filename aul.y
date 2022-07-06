@@ -75,6 +75,8 @@ using std::move;
 %token PERCENT "%"
 %token CARET "^"
 %token AMPERSAND "&"
+%token LEFT_SHIFT "<<"
+%token RIGHT_SHIFT ">>"
 
 %token LESS "<"
 %token GREATER ">"
@@ -104,6 +106,7 @@ using std::move;
 %right "="
 %left "==" "!=" "<=" ">=" "<" ">"
 %left "&" "|" "^"
+%left "<<" ">>"
 %left "+" "-"
 %left "*" "/" "%"
 
@@ -135,7 +138,7 @@ definition: "const" IDENTIFIER "=" expression ";" {
     $$ = make_unique<DefinitionNode>(false, $2, $4);
 }
 
-expression: integer-expression | cast-expression | function-expression | binary-expression
+expression: integer-expression | cast-expression | function-expression | binary-expression | "(" expression ")" {$$ = $2;}
 
 cast-expression: expression "as" type {
     $$ = make_unique<CastNode>($3, $1);
@@ -273,6 +276,12 @@ binary-expression:
 }
 | expression "^" expression {
     $$ = make_unique<BinaryExpressionNode>(BinaryOperatorType::BITWISE_XOR, $1, $3);
+}
+| expression "<<" expression {
+    $$ = make_unique<BinaryExpressionNode>(BinaryOperatorType::BITWISE_LEFT_SHIFT, $1, $3);
+}
+| expression ">>" expression {
+    $$ = make_unique<BinaryExpressionNode>(BinaryOperatorType::BITWISE_RIGHT_SHIFT, $1, $3);
 }
     | expression "=" expression {
         $$ = make_unique<BinaryExpressionNode>(BinaryOperatorType::ASSIGN, $1, $3);
