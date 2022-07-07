@@ -6,3 +6,4 @@ const func = (a: fastint, b: fastint)-> {
     let yetAnotherOne = -(5+3<<8-75*1024/4);
   } as fastint[](int32);
 };
+const a = a as A;

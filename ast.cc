@@ -60,4 +60,7 @@ void UnaryExpressionNode::apply(AstVisitor &visitor) {
     valueVisitor->visitEnd();
   }
 }
+void VariableReferenceNode::apply(AstVisitor &visitor) {
+  visitor.visitVariableReference(name);
+}
 } // namespace aul

@@ -65,6 +65,7 @@ public:
   }
 
   virtual void visitInteger(uintmax_t value) {}
+  virtual void visitVariableReference(const std::string &name) {}
 
   virtual void visitEnd() {}
 };
@@ -167,6 +168,14 @@ public:
 private:
   UnaryOperatorType operatorType;
   std::unique_ptr<AstNode> value;
+};
+class VariableReferenceNode : public AstNode {
+public:
+  VariableReferenceNode(const std::string &name) : name(name) {}
+  virtual void apply(AstVisitor &visitor) override;
+
+private:
+  std::string name;
 };
 } // namespace aul
 

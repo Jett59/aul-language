@@ -79,6 +79,9 @@ std::unique_ptr<AstVisitor> AstPrinter::visitUnaryExpression(UnaryOperatorType o
 void AstPrinter::visitInteger(uintmax_t value) {
   out << "Integer: " << value << std::endl;
 }
+void AstPrinter::visitVariableReference(const std::string &name) {
+  out << "VariableReference: " << name << std::endl;
+}
 
 void AstPrinter::visitEnd() { out << "}" << std::endl; }
 } // namespace aul

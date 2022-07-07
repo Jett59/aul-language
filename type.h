@@ -7,7 +7,14 @@
 #include <vector>
 
 namespace aul {
-enum class TypeCategory { PRIMITIVE, ARRAY, TUPLE, INTERSECTION, FUNCTION };
+enum class TypeCategory {
+  PRIMITIVE,
+  ARRAY,
+  TUPLE,
+  INTERSECTION,
+  FUNCTION,
+  ALIAS
+};
 class Type {
 public:
   virtual ~Type() {}
@@ -163,6 +170,19 @@ public:
 private:
   std::unique_ptr<Type> returnType;
   std::vector<std::unique_ptr<Type>> parameterTypes;
+};
+class TypeAlias : public Type {
+public:
+  TypeAlias(std::string name) : name(std::move(name)) {}
+
+  virtual TypeCategory getTypeCategory() const { return TypeCategory::ALIAS; }
+
+  const std::string &getName() { return name; }
+
+  virtual std::string toString() const { return "Alias<" + name + ">"; }
+
+private:
+  std::string name;
 };
 } // namespace aul
 

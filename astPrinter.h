@@ -26,10 +26,11 @@ public:
   visitUnaryExpression(UnaryOperatorType operatorType) override;
 
   virtual void visitInteger(uintmax_t value) override;
+  virtual void visitVariableReference(const std::string &name) override;
 
-  virtual void visitEnd() override;
+      virtual void visitEnd() override;
 
-private:
+ private:
   std::ostream &out;
 };
 } // namespace aul
