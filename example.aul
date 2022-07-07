@@ -1,4 +1,4 @@
-let thingy = -- -17 ++ as <int32|size>;
+let thingy = -17++ as <int32|size>;
 const func = (a: fastint, b: fastint)-> {
   const subVar = 17;
   let subFunc = (age: int32)-> {

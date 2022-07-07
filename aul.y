@@ -116,8 +116,8 @@ using std::move;
 
 %precedence "as"
 
+%nonassoc "++" "--"
 %precedence "unary -"
-%right "++" "--"
 
 %start compilation_unit
 
