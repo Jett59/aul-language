@@ -1,8 +1,8 @@
-let thingy = 17 as <int32|size>;
+let thingy = -- -17 ++ as <int32|size>;
 const func = (a: fastint, b: fastint)-> {
-  // TODO
   const subVar = 17;
   let subFunc = (age: int32)-> {
     const innerMostVariable = 17 + 8 * 17 % 3 / 6 == 7 << 3 + (1 << 2);
-  };
+    let yetAnotherOne = -(5+3<<8-75*1024/4);
+  } as fastint[](int32);
 };

@@ -29,6 +29,15 @@ enum class BinaryOperatorType {
   LESS_EQUAL,
   GREATER_EQUAL
 };
+enum class UnaryOperatorType {
+  NEGATE,
+  BITWISE_NOT,
+  LOGICAL_NOT,
+  PREFIX_INCREMENT,
+  PREFIX_DECREMENT,
+  POSTFIX_INCREMENT,
+  POSTFIX_DECREMENT
+};
 class AstVisitor {
 public:
   virtual ~AstVisitor() {}
@@ -48,6 +57,10 @@ public:
   virtual std::unique_ptr<AstVisitor> visitBlock() { return nullptr; }
   virtual std::unique_ptr<AstVisitor>
   visitBinaryExpression(BinaryOperatorType operatorType) {
+    return nullptr;
+  }
+  virtual std::unique_ptr<AstVisitor>
+  visitUnaryExpression(UnaryOperatorType operatorType) {
     return nullptr;
   }
 
@@ -142,6 +155,18 @@ private:
   BinaryOperatorType operatorType;
   std::unique_ptr<AstNode> left;
   std::unique_ptr<AstNode> right;
+};
+class UnaryExpressionNode : public AstNode {
+public:
+  UnaryExpressionNode(UnaryOperatorType operatorType,
+                      std::unique_ptr<AstNode> value)
+      : operatorType(operatorType), value(std::move(value)) {}
+
+  virtual void apply(AstVisitor &visitor) override;
+
+private:
+  UnaryOperatorType operatorType;
+  std::unique_ptr<AstNode> value;
 };
 } // namespace aul
 

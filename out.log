@@ -1,0 +1,78 @@
+Definitions {
+Definition: mutable thingy {
+Cast<intersection<int32|size>> {
+-- (prefix {
+- (unary) {
+++ (postfix) {
+Integer: 17
+}
+}
+}
+}
+}
+Definition: constant func {
+Function:
+Parameter: a: fastint
+Parameter: b: fastint
+{
+Definition: constant subVar {
+Integer: 17
+}
+Definition: mutable subFunc {
+Cast<function<int32:array<fastint>>> {
+Function:
+Parameter: age: int32
+{
+Definition: constant innerMostVariable {
+== {
++ {
+Integer: 17
+/ {
+% {
+* {
+Integer: 8
+Integer: 17
+}
+Integer: 3
+}
+Integer: 6
+}
+}
+<< {
+Integer: 7
++ {
+Integer: 3
+<< {
+Integer: 1
+Integer: 2
+}
+}
+}
+}
+}
+Definition: mutable yetAnotherOne {
+- (unary) {
+<< {
++ {
+Integer: 5
+Integer: 3
+}
+- {
+Integer: 8
+/ {
+* {
+Integer: 75
+Integer: 1024
+}
+Integer: 4
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}
+}

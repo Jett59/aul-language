@@ -62,6 +62,20 @@ AstPrinter::visitBinaryExpression(BinaryOperatorType operatorType) {
   return std::make_unique<AstPrinter>(out);
 }
 
+static const std::map<UnaryOperatorType, std::string> unaryOperatorToString = {
+    {UnaryOperatorType::NEGATE, "- (unary)"},
+    {UnaryOperatorType::BITWISE_NOT, "~"},
+    {UnaryOperatorType::LOGICAL_NOT, "!"},
+    {UnaryOperatorType::PREFIX_INCREMENT, "++ (prefix)"},
+    {UnaryOperatorType::PREFIX_DECREMENT, "-- (prefix"},
+    {UnaryOperatorType::POSTFIX_INCREMENT, "++ (postfix)"},
+    {UnaryOperatorType::POSTFIX_DECREMENT, "-- (postfix)"}};
+
+std::unique_ptr<AstVisitor> AstPrinter::visitUnaryExpression(UnaryOperatorType operatorType) {
+  out << unaryOperatorToString.at(operatorType) << " {" << std::endl;
+  return std::make_unique<AstPrinter>(out);
+}
+
 void AstPrinter::visitInteger(uintmax_t value) {
   out << "Integer: " << value << std::endl;
 }

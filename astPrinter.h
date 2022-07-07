@@ -22,6 +22,8 @@ public:
   virtual std::unique_ptr<AstVisitor> visitBlock() override;
   virtual std::unique_ptr<AstVisitor>
   visitBinaryExpression(BinaryOperatorType operatorType) override;
+  virtual std::unique_ptr<AstVisitor>
+  visitUnaryExpression(UnaryOperatorType operatorType) override;
 
   virtual void visitInteger(uintmax_t value) override;
 

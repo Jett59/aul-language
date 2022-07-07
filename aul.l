@@ -65,6 +65,9 @@ static uintmax_t toInt(const char *str) {
 "|" return MAKE(PIPE);
 ":" return MAKE(COLON);
 
+"++" return MAKE(INCREMENT);
+"--" return MAKE(DECREMENT);
+
 "+" return MAKE(PLUS);
 "-" return MAKE(MINUS);
 "*" return MAKE(STAR);
